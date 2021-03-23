@@ -32,12 +32,16 @@ public class LoginServlet extends HttpServlet {
 			String senha = request.getParameter("senha");
 
 			if (daoLogin.validarLogin(login, senha)) { // acesso ok
+				
 				RequestDispatcher dispatcher = request.getRequestDispatcher("AcessoLiberado.jsp");
 				dispatcher.forward(request, response);
+				
 			} else { // acesso negado
+				
 				RequestDispatcher dispatcher = request.getRequestDispatcher("AcessoNegado.jsp");
 				dispatcher.forward(request, response);
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

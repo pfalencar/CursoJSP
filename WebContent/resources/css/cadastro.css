@@ -1,5 +1,10 @@
 h1 {
-	text-align: center
+	text-align: center;
+}
+
+.msg {
+	text-align: center;
+	color: orange;
 }
 
 .form-style-1 {
@@ -83,6 +88,7 @@ h1 {
 .form-style-1 .required {
 	color: red;
 }
+
 
 
 

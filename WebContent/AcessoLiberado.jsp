@@ -7,7 +7,7 @@
 <title>Acesso Liberado</title>
 </head>
 <body>
-	<h2>Acesso Liberado ao Sistema JSP </h2>	
-	<a href="salvarUsuario?acao=listarTodos">Cadastro de usuários</a>
+	<h2>Seja bem vindo(a) ao Sistema em JSP </h2>	
+	<a href="salvarUsuario?acao=listarTodos"><img src="resources/img/usuaria184px.png" alt="Cadastro de Usuário" title="Cadastro de Usuário"/></a>
 </body>
 </html>

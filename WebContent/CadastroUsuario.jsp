@@ -13,6 +13,8 @@
 <body>
 	<h1>Cadastro de Usuário</h1>
 	
+	<h3 class="msg">${msg}</h3>
+	
 	<form action="salvarUsuario" method="post" id="formUser">
 		<ul class="form-style-1">
 			<table>
@@ -41,6 +43,12 @@
 				</tr>
 				
 				<tr>
+					<td>Fone:</td>
+					<td><input type="text" id="fone" name="fone"
+						value="${user.fone}"></td>
+				</tr>
+				
+				<tr>
 					<td></td>
 					<td>
 						<input type="submit"value="Salvar" />
@@ -58,6 +66,7 @@
 			<th>Login</th>
 			<th>Senha</th>
 			<th>Nome</th>
+			<th>Fone</th>
 			<th>Deletar</th>
 			<th>Editar</th>
 		</tr>
@@ -69,6 +78,7 @@
 				<td style="width: 150px"><c:out value="${user.login}"></c:out></td>
 				<td><c:out value="${user.senha}"></c:out></td>
 				<td><c:out value="${user.nome}"></c:out></td>
+				<td><c:out value="${user.fone}"></c:out></td>
 
 				<td><a href="salvarUsuario?acao=delete&user=${user.id}"><img src="resources/img/lixeira.png" alt="Excluir" title="Excluir"></a>
 				<td><a href="salvarUsuario?acao=editar&user=${user.id}"><img src="resources/img/editar.png"  alt="Editar" title="Editar" /></a>

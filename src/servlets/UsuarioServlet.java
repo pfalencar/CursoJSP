@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.JOptionPane;
 
 import beans.BeanCursoJsp;
 import dao.DaoUsuario;
@@ -34,6 +35,8 @@ public class UsuarioServlet extends HttpServlet {
 
 				daoUsuario.delete(user);
 
+				request.setAttribute("msg", "Deletado com sucesso!");
+				
 				// depois que deletou eu carrego os usuários e volto para a mesma página
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
 
@@ -52,7 +55,7 @@ public class UsuarioServlet extends HttpServlet {
 
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
 				request.setAttribute("usuario", daoUsuario.listar());
-				view.forward(request, response);			
+				view.forward(request, response);
 			}
 
 		} catch (Exception e) {
@@ -68,21 +71,21 @@ public class UsuarioServlet extends HttpServlet {
 		String acao = request.getParameter("acao");
 
 		if (acao != null && acao.equalsIgnoreCase("reset")) {
-			try {				
+			try {
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
 				request.setAttribute("usuario", daoUsuario.listar());
 				view.forward(request, response);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-			
+
 		} else {
 
 			String id = request.getParameter("id");
 			String login = request.getParameter("login");
 			String senha = request.getParameter("senha");
 			String nome = request.getParameter("nome");
+			String fone = request.getParameter("fone");
 
 			BeanCursoJsp beanCursoJsp = new BeanCursoJsp();
 
@@ -90,32 +93,59 @@ public class UsuarioServlet extends HttpServlet {
 			beanCursoJsp.setLogin(!login.isEmpty() || !login.isBlank() ? login : null);
 			beanCursoJsp.setSenha(!senha.isEmpty() || !senha.isBlank() ? senha : null);
 			beanCursoJsp.setNome(!nome.isEmpty() || !nome.isBlank() ? nome : null);
+			beanCursoJsp.setFone(!fone.isEmpty() || !fone.isBlank() ? fone : null);
 
-			if (id == null || id.isEmpty()) {
-				daoUsuario.salvar(beanCursoJsp);
+			try {
+				
+				if ( id == null || id.isEmpty() ) {
+					
+					if ( !daoUsuario.isLoginDuplicado(login) ) {
+						
+						daoUsuario.salvar(beanCursoJsp);
+						request.setAttribute("msg", "Salvo com sucesso!");
+						
+					} else {
+						
+						request.setAttribute("msg", "Este login já existe! Escolha outro login.");//"msg" é a variável jsp que está em <h3> no CadastroUsuario.jsp
+					}
+					
+				} else if ( id != null && !id.isEmpty() && daoUsuario.isLoginDuplicadoAtualizar(login, id)) {
 
-				// para ficar na mesma página após cadastrar novo usuário
-				try {
-					RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-					request.setAttribute("usuario", daoUsuario.listar());
-					view.forward(request, response);
-				} catch (Exception e) {
-					e.printStackTrace();
+					daoUsuario.atualizar(beanCursoJsp);
+					
+				} else {
+					request.setAttribute("msg", "Login já existe para outro usuário ao atualizar!");
 				}
+				
+//				if (id == null || id.isEmpty() && daoUsuario.isLoginDuplicado(login)) {
+//					
+//					request.setAttribute("msg", "Este login já existe! Escolha outro login."); //"msg" é a variável jsp que está em <h3> no CadastroUsuario.jsp
+//					
+//				} else if (id == null || id.isEmpty() && !daoUsuario.isLoginDuplicado(login)) {
+//
+//					daoUsuario.salvar(beanCursoJsp);
+//					request.setAttribute("msg", "Salvo com sucesso!");
+//
+//				} else if (id != null && !id.isEmpty() && daoUsuario.isLoginDuplicadoAtualizar(login)) {
+//
+//					daoUsuario.atualizar(beanCursoJsp);
+//					
+//				} 
 
-			} else {
-				daoUsuario.atualizar(beanCursoJsp);
-
-				// para ficar na mesma página após cadastrar novo usuário
-				try {
-					RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-					request.setAttribute("usuario", daoUsuario.listar());
-					view.forward(request, response);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
+			// para ficar na mesma página após cadastrar novo usuário
+			try {
+				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
+				request.setAttribute("usuario", daoUsuario.listar()); //"usuario" é a variável jsp do foreach no CadastroUsuario.jsp: (<c:forEach items="${usuario}" var="user">)
+				view.forward(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 		}
+
 	}
 
 	@Override

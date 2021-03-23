@@ -21,29 +21,36 @@ public class DaoUsuario {
 	}
 
 	public void salvar(BeanCursoJsp beanCursoJsp) {
-		String sql = "INSERT INTO usuario (login, senha, nome) VALUES (?, ?, ?)";
-		
+		String sql = "INSERT INTO usuario (login, senha, nome, fone) VALUES (?, ?, ?, ?)";
+
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
-			
+
 			if (beanCursoJsp.getLogin() != null) {
 				preparedStatement.setString(1, beanCursoJsp.getLogin());
 			} else {
 				JOptionPane.showMessageDialog(null, "Insira um login válido.");
 			}
-			
+
 			if (beanCursoJsp.getSenha() != null) {
 				preparedStatement.setString(2, beanCursoJsp.getSenha());
 			} else {
 				JOptionPane.showMessageDialog(null, "Insira uma senha válida.");
 			}
-			
+
 			if (beanCursoJsp.getNome() != null) {
 				preparedStatement.setString(3, beanCursoJsp.getNome());
 			} else {
 				JOptionPane.showMessageDialog(null, "Insira um nome válido.");
 			}
 			
+			if (beanCursoJsp.getFone() != null) {
+				preparedStatement.setString(4, beanCursoJsp.getFone());
+			} else {
+				JOptionPane.showMessageDialog(null, "Insira um telefone válido.");
+			}
+
+
 			preparedStatement.execute();
 			connection.commit();
 
@@ -72,7 +79,8 @@ public class DaoUsuario {
 			beanCursoJsp.setLogin(resultSet.getString("login"));
 			beanCursoJsp.setSenha(resultSet.getString("senha"));
 			beanCursoJsp.setNome(resultSet.getString("nome"));
-			
+			beanCursoJsp.setFone(resultSet.getString("fone"));
+
 			lista.add(beanCursoJsp);
 		}
 		return lista;
@@ -86,10 +94,10 @@ public class DaoUsuario {
 			preparedStatement.execute();
 
 			connection.commit();
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-			
+
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
@@ -112,23 +120,56 @@ public class DaoUsuario {
 			beanCursoJsp.setLogin(resultSet.getString("login"));
 			beanCursoJsp.setSenha(resultSet.getString("senha"));
 			beanCursoJsp.setNome(resultSet.getString("nome"));
-			
+			beanCursoJsp.setFone(resultSet.getString("fone"));
+
 			return beanCursoJsp;
 		}
 
 		return null;
 	}
 
+	public boolean isLoginDuplicado(String login) throws Exception {
+		String sql = "SELECT count(1) AS qtd FROM usuario WHERE login = '" + login + "'";
+
+		PreparedStatement preparedStatement = connection.prepareStatement(sql);
+		ResultSet resultSet = preparedStatement.executeQuery();
+		
+		if (resultSet.next()) {
+			int res = resultSet.getInt("qtd");
+			System.out.println("Resposta do BD: " + res);
+			return res != 0; //retorna true
+		} else {
+			return false;			
+		}
+	}
+	
+	public boolean isLoginDuplicadoAtualizar(String login, String id) throws Exception {
+		String sql = "SELECT count(1) AS qtd FROM usuario WHERE login = '" + login + "' AND id <> " + id;
+
+		PreparedStatement preparedStatement = connection.prepareStatement(sql);
+		ResultSet resultSet = preparedStatement.executeQuery();
+		
+		if (resultSet.next()) {
+			int res = resultSet.getInt("qtd");
+			System.out.println("Resposta do BD: " + res);
+			return res <= 0; //retorna true
+		} else {
+			return false;			
+		}
+	}
+
+	
 	public void atualizar(BeanCursoJsp beanCursoJsp) {
 		try {
-			String sql = "UPDATE usuario SET login = ?, senha = ?, nome = ?  WHERE id = " + beanCursoJsp.getId();
+			String sql = "UPDATE usuario SET login = ?, senha = ?, nome = ?, fone = ?  WHERE id = " + beanCursoJsp.getId();
 
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
-			
+
 			preparedStatement.setString(1, beanCursoJsp.getLogin());
 			preparedStatement.setString(2, beanCursoJsp.getSenha());
 			preparedStatement.setString(3, beanCursoJsp.getNome());
-			
+			preparedStatement.setString(4, beanCursoJsp.getFone());
+
 			preparedStatement.executeUpdate();
 
 			connection.commit();
