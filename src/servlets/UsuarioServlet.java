@@ -8,7 +8,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.JOptionPane;
 
 import beans.BeanCursoJsp;
 import dao.DaoUsuario;
@@ -24,19 +23,19 @@ public class UsuarioServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		try {
 			String acao = request.getParameter("acao");
-			String user = request.getParameter("user");
+			String user = request.getParameter("user"); // O "user" recebe o id do usuário. Só para deletar e editar, pois têm
+																									// id.
 
 			if (acao.equalsIgnoreCase("delete")) {
 
 				daoUsuario.delete(user);
 
 				request.setAttribute("msg", "Deletado com sucesso!");
-				
+
 				// depois que deletou eu carrego os usuários e volto para a mesma página
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
 
@@ -64,8 +63,7 @@ public class UsuarioServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		// request é a requisição, que é o envio do formulário
 		String acao = request.getParameter("acao");
@@ -89,62 +87,67 @@ public class UsuarioServlet extends HttpServlet {
 
 			BeanCursoJsp beanCursoJsp = new BeanCursoJsp();
 
-			beanCursoJsp.setId(!id.isEmpty() ? Long.parseLong(id) : 0);
+			beanCursoJsp.setId(!id.isEmpty() ? Long.parseLong(id) : null);
 			beanCursoJsp.setLogin(!login.isEmpty() || !login.isBlank() ? login : null);
 			beanCursoJsp.setSenha(!senha.isEmpty() || !senha.isBlank() ? senha : null);
 			beanCursoJsp.setNome(!nome.isEmpty() || !nome.isBlank() ? nome : null);
 			beanCursoJsp.setFone(!fone.isEmpty() || !fone.isBlank() ? fone : null);
 
 			try {
-				
-				if ( id == null || id.isEmpty() ) {
-					
-					if ( !daoUsuario.isLoginDuplicado(login) ) {
-						
-						if ( !daoUsuario.isSenhaDuplicada(senha) ) {
-							
+
+				if (id == null || id.isEmpty()) {
+
+					if (!daoUsuario.isLoginDuplicado(login)) {
+
+						if (!daoUsuario.isSenhaDuplicada(senha)) {
+
 							daoUsuario.salvar(beanCursoJsp);
 							request.setAttribute("msg", "Salvo com sucesso!");
-							
+
 						} else {
 							request.setAttribute("msg", "A senha já existe para outro usuário!");
-						}						
-						
-					} else {
-						
-						request.setAttribute("msg", "O login já existe para outro usuário!");//"msg" é a variável jsp que está em <h3> no CadastroUsuario.jsp
-					}
-					
-				} else if ( id != null && !id.isEmpty() ) {
-						
-						if ( !daoUsuario.isLoginDuplicadoAtualizar(login, id) ) {
-							
-							if ( !daoUsuario.isSenhaDuplicadaAtualizar(senha, id) ) {
-								
-								daoUsuario.atualizar(beanCursoJsp);
-								request.setAttribute("msg", "Atualizado com sucesso!");
-								
-							} else {
-								request.setAttribute("msg", "A senha já existe para outro usuário ao atualizar!");
-							}
-							
-						} else {
-							request.setAttribute("msg", "Login já existe para outro usuário ao atualizar!");
-							
+							request.setAttribute("user", beanCursoJsp);
 						}
-				
-					
+
+					} else {
+
+						request.setAttribute("msg", "O login já existe para outro usuário!");// "msg" é a variável jsp que está em
+																																									// <h3> no CadastroUsuario.jsp
+						request.setAttribute("user", beanCursoJsp);
+					}
+
+				} else if (id != null && !id.isEmpty()) {
+
+					if (!daoUsuario.isLoginDuplicadoAtualizar(login, id)) {
+
+						if (!daoUsuario.isSenhaDuplicadaAtualizar(senha, id)) {
+
+							daoUsuario.atualizar(beanCursoJsp);
+							request.setAttribute("msg", "Atualizado com sucesso!");
+
+						} else {
+							request.setAttribute("msg", "A senha já existe para outro usuário ao atualizar!");
+							request.setAttribute("user", beanCursoJsp);
+						}
+
+					} else {
+						request.setAttribute("msg", "Login já existe para outro usuário ao atualizar!");
+						request.setAttribute("user", beanCursoJsp);
+					}
+
 				} else {
 				}
 
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
-			
+
 			// para ficar na mesma página após cadastrar novo usuário
 			try {
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-				request.setAttribute("usuario", daoUsuario.listar()); //"usuario" é a variável jsp do foreach no CadastroUsuario.jsp: (<c:forEach items="${usuario}" var="user">)
+				request.setAttribute("usuario", daoUsuario.listar()); // "usuario" é a variável jsp do foreach no
+																															// CadastroUsuario.jsp: (<c:forEach items="${usuario}"
+																															// var="user">)
 				view.forward(request, response);
 			} catch (Exception e) {
 				e.printStackTrace();

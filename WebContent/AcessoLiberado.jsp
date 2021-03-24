@@ -8,6 +8,12 @@
 </head>
 <body>
 	<h2>Seja bem vindo(a) ao Sistema em JSP </h2>	
-	<a href="salvarUsuario?acao=listarTodos"><img src="resources/img/usuaria184px.png" alt="Cadastro de Usuário" title="Cadastro de Usuário"/></a>
+	<a href="salvarUsuario?acao=listarTodos">
+      <img src="resources/img/usuaria184px.png" alt="Cadastro de Usuário" title="Cadastro de Usuário"/>
+    </a>
+    
+    <a href="salvarProduto?acao=listarTodos">
+      <img src="resources/img/produto184px.png" alt="Cadastro de Produto" title="Cadastro de Produto" />
+    </a>
 </body>
 </html>

@@ -73,8 +73,9 @@ public class DaoUsuario {
 		ResultSet resultSet = statement.executeQuery();
 
 		while (resultSet.next()) {
-
+			
 			BeanCursoJsp beanCursoJsp = new BeanCursoJsp();
+			
 			beanCursoJsp.setId(resultSet.getLong("id"));
 			beanCursoJsp.setLogin(resultSet.getString("login"));
 			beanCursoJsp.setSenha(resultSet.getString("senha"));
@@ -90,6 +91,7 @@ public class DaoUsuario {
 		try {
 //			Long idLong = Long.parseLong(id);
 			String sql = "DELETE FROM usuario WHERE id = '" + id + "'";
+			
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.execute();
 
@@ -116,11 +118,12 @@ public class DaoUsuario {
 
 		if (resultSet.next()) {
 			BeanCursoJsp beanCursoJsp = new BeanCursoJsp();
-			beanCursoJsp.setId(resultSet.getLong("id"));
-			beanCursoJsp.setLogin(resultSet.getString("login"));
-			beanCursoJsp.setSenha(resultSet.getString("senha"));
-			beanCursoJsp.setNome(resultSet.getString("nome"));
-			beanCursoJsp.setFone(resultSet.getString("fone"));
+			
+			beanCursoJsp.setId( resultSet.getLong("id") );
+			beanCursoJsp.setLogin( resultSet.getString("login") );
+			beanCursoJsp.setSenha( resultSet.getString("senha") );
+			beanCursoJsp.setNome( resultSet.getString("nome") );
+			beanCursoJsp.setFone( resultSet.getString("fone") );
 
 			return beanCursoJsp;
 		}
