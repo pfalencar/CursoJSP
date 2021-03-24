@@ -87,7 +87,7 @@ public class DaoUsuario {
 		return lista;
 	}
 
-	public void delete(String id) {
+	public void deletar(String id) {
 		try {
 //			Long idLong = Long.parseLong(id);
 			String sql = "DELETE FROM usuario WHERE id = '" + id + "'";

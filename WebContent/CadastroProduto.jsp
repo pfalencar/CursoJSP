@@ -42,7 +42,8 @@
           <tr>
             <td></td>
             <td>
-              <input type="submit" value="Salvar"/>
+              <input type="submit" value="Salvar"
+              onclick="document.getElementById('formProd').action='salvarProduto?acao=salvar'" />
               <input type="submit" value="Cancelar" 
               onclick="document.getElementById('formProd').action='salvarProduto?acao=reset'" />
             </td>

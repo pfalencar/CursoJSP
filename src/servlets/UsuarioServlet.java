@@ -32,7 +32,7 @@ public class UsuarioServlet extends HttpServlet {
 
 			if (acao.equalsIgnoreCase("delete")) {
 
-				daoUsuario.delete(user);
+				daoUsuario.deletar(user);
 
 				request.setAttribute("msg", "Deletado com sucesso!");
 
