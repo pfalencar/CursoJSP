@@ -101,40 +101,46 @@ public class UsuarioServlet extends HttpServlet {
 					
 					if ( !daoUsuario.isLoginDuplicado(login) ) {
 						
-						daoUsuario.salvar(beanCursoJsp);
-						request.setAttribute("msg", "Salvo com sucesso!");
+						if ( !daoUsuario.isSenhaDuplicada(senha) ) {
+							
+							daoUsuario.salvar(beanCursoJsp);
+							request.setAttribute("msg", "Salvo com sucesso!");
+							
+						} else {
+							request.setAttribute("msg", "A senha já existe para outro usuário!");
+						}						
 						
 					} else {
 						
-						request.setAttribute("msg", "Este login já existe! Escolha outro login.");//"msg" é a variável jsp que está em <h3> no CadastroUsuario.jsp
+						request.setAttribute("msg", "O login já existe para outro usuário!");//"msg" é a variável jsp que está em <h3> no CadastroUsuario.jsp
 					}
 					
-				} else if ( id != null && !id.isEmpty() && daoUsuario.isLoginDuplicadoAtualizar(login, id)) {
-
-					daoUsuario.atualizar(beanCursoJsp);
+				} else if ( id != null && !id.isEmpty() ) {
+						
+						if ( !daoUsuario.isLoginDuplicadoAtualizar(login, id) ) {
+							
+							if ( !daoUsuario.isSenhaDuplicadaAtualizar(senha, id) ) {
+								
+								daoUsuario.atualizar(beanCursoJsp);
+								request.setAttribute("msg", "Atualizado com sucesso!");
+								
+							} else {
+								request.setAttribute("msg", "A senha já existe para outro usuário ao atualizar!");
+							}
+							
+						} else {
+							request.setAttribute("msg", "Login já existe para outro usuário ao atualizar!");
+							
+						}
+				
 					
 				} else {
-					request.setAttribute("msg", "Login já existe para outro usuário ao atualizar!");
 				}
-				
-//				if (id == null || id.isEmpty() && daoUsuario.isLoginDuplicado(login)) {
-//					
-//					request.setAttribute("msg", "Este login já existe! Escolha outro login."); //"msg" é a variável jsp que está em <h3> no CadastroUsuario.jsp
-//					
-//				} else if (id == null || id.isEmpty() && !daoUsuario.isLoginDuplicado(login)) {
-//
-//					daoUsuario.salvar(beanCursoJsp);
-//					request.setAttribute("msg", "Salvo com sucesso!");
-//
-//				} else if (id != null && !id.isEmpty() && daoUsuario.isLoginDuplicadoAtualizar(login)) {
-//
-//					daoUsuario.atualizar(beanCursoJsp);
-//					
-//				} 
 
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
+			
 			// para ficar na mesma página após cadastrar novo usuário
 			try {
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");

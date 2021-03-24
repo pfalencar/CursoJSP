@@ -143,6 +143,21 @@ public class DaoUsuario {
 		}
 	}
 	
+	public boolean isSenhaDuplicada(String senha) throws Exception {
+		String sql = "SELECT count(1) AS qtd FROM usuario WHERE senha = '" + senha + "'";
+
+		PreparedStatement preparedStatement = connection.prepareStatement(sql);
+		ResultSet resultSet = preparedStatement.executeQuery();
+		
+		if (resultSet.next()) {
+			int res = resultSet.getInt("qtd");
+			System.out.println("Resposta do BD: " + res);
+			return res != 0; //retorna true
+		} else {
+			return false;			
+		}
+	}
+	
 	public boolean isLoginDuplicadoAtualizar(String login, String id) throws Exception {
 		String sql = "SELECT count(1) AS qtd FROM usuario WHERE login = '" + login + "' AND id <> " + id;
 
@@ -152,12 +167,26 @@ public class DaoUsuario {
 		if (resultSet.next()) {
 			int res = resultSet.getInt("qtd");
 			System.out.println("Resposta do BD: " + res);
-			return res <= 0; //retorna true
+			return res > 0; //retorna true
 		} else {
 			return false;			
 		}
 	}
 
+	public boolean isSenhaDuplicadaAtualizar(String senha, String id) throws Exception {
+		String sql = "SELECT count(1) AS qtd FROM usuario WHERE senha = '" + senha + "' AND id <> " + id;
+
+		PreparedStatement preparedStatement = connection.prepareStatement(sql);
+		ResultSet resultSet = preparedStatement.executeQuery();
+		
+		if (resultSet.next()) {
+			int res = resultSet.getInt("qtd");
+			System.out.println("Resposta do BD: " + res);
+			return res > 0; //retorna true
+		} else {
+			return false;			
+		}
+	}
 	
 	public void atualizar(BeanCursoJsp beanCursoJsp) {
 		try {
