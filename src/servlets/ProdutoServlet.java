@@ -35,7 +35,8 @@ public class ProdutoServlet extends HttpServlet {
 			} else if (acao.equalsIgnoreCase("delete")) {
 
 				daoProduto.deletar(idProduto);
-
+				request.setAttribute("msg", "Deletado com sucesso!");
+				
 				RequestDispatcher view = request.getRequestDispatcher("CadastroProduto.jsp");
 				request.setAttribute("produto", daoProduto.listar());
 				view.forward(request, response);
@@ -80,14 +81,26 @@ public class ProdutoServlet extends HttpServlet {
 			String valor = request.getParameter("valor");
 
 			Produto produto = new Produto();
-
+			
 			produto.setId(id != null && !id.isEmpty() ? Long.valueOf(id) : null);
 			produto.setNome(nome != null && !nome.isEmpty() ? nome : null);
-			produto.setQuantidade(quantidade != null && !quantidade.isEmpty() ? Double.parseDouble(quantidade) : null);
-			produto.setValor(valor != null && !valor.isEmpty() ? Double.parseDouble(valor) : null);
+			produto.setQuantidade(quantidade != null && !quantidade.isEmpty() ? Double.parseDouble(quantidade) : 0.00);
+			produto.setValor(valor != null && !valor.isEmpty() ? Double.parseDouble(valor) : 0.00);
 
 			try {
-				if (id == null || id.isEmpty()) {
+				if ( nome == null || nome.isEmpty() ) {
+					request.setAttribute("msg", "Nome é obrigatório!");
+					request.setAttribute("prod", produto);
+					
+				} else if ( quantidade == null || quantidade.isEmpty() || produto.getQuantidade() == 0.00 ) {
+					request.setAttribute("msg", "Quantidade é obrigatória!");
+					request.setAttribute("prod", produto);
+					
+				} else if ( valor == null || valor.isBlank() || produto.getValor() == 0.00 ) {
+					request.setAttribute("msg", "Valor é obrigatório!");
+					request.setAttribute("prod", produto);
+					
+				} else if (id == null || id.isEmpty()) {
 					if (!daoProduto.isNomeProdutoDuplicado(nome)) {
 						daoProduto.salvar(produto);
 						request.setAttribute("msg", "Salvo com sucesso!");
@@ -95,6 +108,7 @@ public class ProdutoServlet extends HttpServlet {
 						request.setAttribute("msg", "Já existe um produto cadastrado com este nome.");
 						request.setAttribute("prod", produto);
 					}
+					
 				} else if (id != null || !id.isEmpty()) {
 					if ( !daoProduto.isNomeProdutoDuplicadoAtualizar(nome, id) ) {
 						daoProduto.atualizar(produto);
@@ -104,6 +118,7 @@ public class ProdutoServlet extends HttpServlet {
 						request.setAttribute("prod", produto);
 					}
 				}
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

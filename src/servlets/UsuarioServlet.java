@@ -95,7 +95,23 @@ public class UsuarioServlet extends HttpServlet {
 
 			try {
 
-				if (id == null || id.isEmpty()) {
+				if ( login == null || login.isEmpty() ) {
+					request.setAttribute("msg", "Login é obrigatório!");
+					request.setAttribute("user", beanCursoJsp);
+					
+				} else if ( senha == null || senha.isEmpty() ) {
+					request.setAttribute("msg", "Senha é obrigatória!");
+					request.setAttribute("user", beanCursoJsp);
+					
+				} else if ( nome == null || nome.isEmpty() ) {
+					request.setAttribute("msg", "Nome é obrigatório!");
+					request.setAttribute("user", beanCursoJsp);
+					
+				} else if ( fone == null || fone.isEmpty() ) {
+					request.setAttribute("msg", "Telefone é obrigatório!");
+					request.setAttribute("user", beanCursoJsp);
+					
+				} else if (id == null || id.isEmpty()) {
 
 					if (!daoUsuario.isLoginDuplicado(login)) {
 
