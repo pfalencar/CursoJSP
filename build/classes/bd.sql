@@ -30,8 +30,31 @@ CREATE DATABASE "curso-jsp"
 	);
 	ALTER TABLE public.usuario
 	  OWNER TO postgres;
-
 	  
 	INSERT INTO usuario (id, login, senha, nome) VALUES (1, 'admin', 'admin', 'Administrador');
 	INSERT INTO usuario (id, login, senha, nome) VALUES (2, 'pati', 'ppp', 'Patricia');
+	
+	
+	CREATE TABLE public.produto
+	(
+	  id integer NOT NULL DEFAULT nextval('produto_id_seq'::regclass),
+	  nome character varying(255) NOT NULL,
+	  quantidade numeric(10,2) NOT NULL,
+	  valor numeric(10,2) NOT NULL,
+	  CONSTRAINT produto_id PRIMARY KEY (id)
+	)
+	WITH (
+	  OIDS=FALSE
+	);
+	ALTER TABLE public.produto
+	  OWNER TO postgres;
+	  
+	CREATE SEQUENCE public.produto_id_seq
+	  INCREMENT 1
+	  MINVALUE 1
+	  MAXVALUE 9223372036854775807
+	  START 14
+	  CACHE 1;
+	ALTER TABLE public.produto_id_seq
+	  OWNER TO postgres;
 	

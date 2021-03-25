@@ -62,54 +62,60 @@ public class ProdutoServlet extends HttpServlet {
 
 		String acao = request.getParameter("acao");
 
-		try {
-
-			if (acao.equalsIgnoreCase("reset")) {
-
+		if (acao.equalsIgnoreCase("reset")) {
+			
+			try {
 				RequestDispatcher view = request.getRequestDispatcher("CadastroProduto.jsp");
 				request.setAttribute("produto", daoProduto.listar());
 				view.forward(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		} else if (acao.equalsIgnoreCase("salvar")) {
 
-			} else if (acao.equalsIgnoreCase("salvar")) {
+			String id = request.getParameter("id");
+			String nome = request.getParameter("nome");
+			String quantidade = request.getParameter("quantidade");
+			String valor = request.getParameter("valor");
 
-				String id = request.getParameter("id");
-				String nome = request.getParameter("nome");
-				String quantidade = request.getParameter("quantidade");
-				String valor = request.getParameter("valor");
+			Produto produto = new Produto();
 
-				Produto produto = new Produto();
+			produto.setId(id != null && !id.isEmpty() ? Long.valueOf(id) : null);
+			produto.setNome(nome != null && !nome.isEmpty() ? nome : null);
+			produto.setQuantidade(quantidade != null && !quantidade.isEmpty() ? Double.parseDouble(quantidade) : null);
+			produto.setValor(valor != null && !valor.isEmpty() ? Double.parseDouble(valor) : null);
 
-				produto.setId(id != null && !id.isEmpty() ? Long.valueOf(id) : null);
-				produto.setNome(nome != null && !nome.isEmpty() ? nome : null);
-				produto.setQuantidade(quantidade != null && !quantidade.isEmpty() ? Double.parseDouble(quantidade) : null);
-				produto.setValor(valor != null && !valor.isEmpty() ? Double.parseDouble(valor) : null);
-				
-				try {
-					
-					if ( id == null || id.isEmpty() ) {
+			try {
+				if (id == null || id.isEmpty()) {
+					if (!daoProduto.isNomeProdutoDuplicado(nome)) {
 						daoProduto.salvar(produto);
-						
-						RequestDispatcher requestDispatcher = request.getRequestDispatcher("CadastroProduto.jsp");
-						request.setAttribute("produto", daoProduto.listar());
-						requestDispatcher.forward(request, response);
-						
-					} else if ( id != null || !id.isEmpty() ) {
-						daoProduto.atualizar(produto);
-						
-						RequestDispatcher requestDispatcher = request.getRequestDispatcher("CadastroProduto.jsp");
-						request.setAttribute("produto", daoProduto.listar());
-						requestDispatcher.forward(request, response);
+						request.setAttribute("msg", "Salvo com sucesso!");
+					} else {
+						request.setAttribute("msg", "Já existe um produto cadastrado com este nome.");
+						request.setAttribute("prod", produto);
 					}
-
-				} catch (Exception e) {
-					e.printStackTrace();
+				} else if (id != null || !id.isEmpty()) {
+					if ( !daoProduto.isNomeProdutoDuplicadoAtualizar(nome, id) ) {
+						daoProduto.atualizar(produto);
+						request.setAttribute("msg", "Atualizado com sucesso!");
+					} else {
+						request.setAttribute("msg", "Já existe um produto cadastrado com este nome ao atualizar!");
+						request.setAttribute("prod", produto);
+					}
 				}
-
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			try {
+				RequestDispatcher requestDispatcher = request.getRequestDispatcher("CadastroProduto.jsp");
+				request.setAttribute("produto", daoProduto.listar());
+				requestDispatcher.forward(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} // acao=salvar
 
 	}
 

@@ -133,10 +133,29 @@ public class DaoProduto {
 	}
 
 	//CONTINUAR NA QUINTA!!!
-	public boolean isNomeProdutoDuplicado(String nome) {
+	public boolean isNomeProdutoDuplicado(String nome) throws Exception {
 		String sql = "SELECT COUNT(1) AS qtd FROM produto WHERE nome = '" + nome + "'";
 		
+		PreparedStatement preparedStatement = connection.prepareStatement(sql);
+		ResultSet resultSet = preparedStatement.executeQuery();
 		
+		if ( resultSet.next() ) {
+			int res = resultSet.getInt("qtd");
+			return res > 0; 
+		} 
+		return false;
+		
+	}
+
+	public boolean isNomeProdutoDuplicadoAtualizar(String nome, String id) throws Exception {
+		String sql = "SELECT COUNT(1) AS qtd FROM produto WHERE nome = '" + nome + "' AND id <> " + id;
+		PreparedStatement preparedStatement = connection.prepareStatement(sql);
+		ResultSet resultSet = preparedStatement.executeQuery();
+		
+		if ( resultSet.next() ) {
+			int res = resultSet.getInt("qtd");
+			return res > 0;
+		}
 		return false;
 	}
 	

@@ -135,8 +135,7 @@ public class UsuarioServlet extends HttpServlet {
 						request.setAttribute("user", beanCursoJsp);
 					}
 
-				} else {
-				}
+				} 
 
 			} catch (Exception e1) {
 				e1.printStackTrace();
