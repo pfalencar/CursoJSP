@@ -83,7 +83,13 @@ public class UsuarioServlet extends HttpServlet {
 			String login = request.getParameter("login");
 			String senha = request.getParameter("senha");
 			String nome = request.getParameter("nome");
-			String fone = request.getParameter("fone");
+			String fone = request.getParameter("fone");			
+			String cep = request.getParameter("cep");
+			String rua = request.getParameter("rua");
+			String bairro = request.getParameter("bairro");
+			String cidade = request.getParameter("cidade");
+			String estado = request.getParameter("uf");
+			String ibge = request.getParameter("ibge");
 
 			BeanCursoJsp beanCursoJsp = new BeanCursoJsp();
 
@@ -92,6 +98,12 @@ public class UsuarioServlet extends HttpServlet {
 			beanCursoJsp.setSenha(!senha.isEmpty() || !senha.isBlank() ? senha : null);
 			beanCursoJsp.setNome(!nome.isEmpty() || !nome.isBlank() ? nome : null);
 			beanCursoJsp.setFone(!fone.isEmpty() || !fone.isBlank() ? fone : null);
+			beanCursoJsp.setCep(!cep.isEmpty() || !cep.isBlank() ? cep : null);
+			beanCursoJsp.setRua(!rua.isEmpty() || !rua.isBlank() ? rua : null);
+			beanCursoJsp.setBairro(!bairro.isEmpty() || !bairro.isBlank() ? bairro : null);
+			beanCursoJsp.setCidade(!cidade.isEmpty() || !cidade.isBlank() ? cidade : null);
+			beanCursoJsp.setEstado(!estado.isEmpty() || !estado.isBlank() ? estado : null);
+			beanCursoJsp.setIbge( !ibge.isEmpty() || !ibge.isBlank() ? ibge : null);
 
 			try {
 
@@ -111,6 +123,10 @@ public class UsuarioServlet extends HttpServlet {
 					request.setAttribute("msg", "Telefone é obrigatório!");
 					request.setAttribute("user", beanCursoJsp);
 					
+				} else if ( cep == null || cep.isEmpty() ) {
+					request.setAttribute("msg", "Cep é obrigatório!");
+					request.setAttribute("user", beanCursoJsp);
+										
 				} else if (id == null || id.isEmpty()) {
 
 					if (!daoUsuario.isLoginDuplicado(login)) {

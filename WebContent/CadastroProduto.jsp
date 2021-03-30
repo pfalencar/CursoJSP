@@ -10,11 +10,13 @@
   </head>
   
   <body>
+    <a href="AcessoLiberado.jsp">Início</a>
+    <a href="index.jsp">Sair</a>
     <h1>Cadastro de Produto</h1>
     
     <h3 class="msg">${msg}</h3>
     
-    <form action="salvarProduto" method="post" id="formProd">    
+    <form action="salvarProduto" method="post" id="formProd" onsubmit="return validarCampos() ? true : false">    
       <ul class="form-style-1">
       
         <table>
@@ -86,6 +88,21 @@
       </c:forEach>
     
     </table>
+    <script type="text/javascript">
+    	function validarCampos() {
+    		if ( document.getElementById('nome').value == '' ) {
+        		alert('Nome não pode ser vazio.');
+        		return false;  
+    		} else if ( document.getElementById('quantidade').value == '' ) {
+    			alert('Quantidade não pode ser vazia.');
+    			return false;
+    		} else if ( document.getElementById('valor').value == '' ) {
+    			alert('Valor não pode vazio.');
+    			return false;
+    		}
+    		return true;
+    	}
     
+    </script>
   </body>
 </html>
