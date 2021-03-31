@@ -38,7 +38,7 @@ public class UsuarioServlet extends HttpServlet {
 
 				// depois que deletou eu carrego os usuários e volto para a mesma página
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-
+				//"usuario" é a tabela da página, onde serão listados os usuários que estão no BD
 				request.setAttribute("usuario", daoUsuario.listar());
 				view.forward(request, response);
 
@@ -47,6 +47,7 @@ public class UsuarioServlet extends HttpServlet {
 				BeanCursoJsp beanCursoJsp = daoUsuario.consultar(user);
 
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
+				//"user" é 1 usuário que está nos campos da tela.
 				request.setAttribute("user", beanCursoJsp);
 				view.forward(request, response);
 

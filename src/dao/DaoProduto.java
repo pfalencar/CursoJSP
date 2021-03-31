@@ -132,7 +132,7 @@ public class DaoProduto {
 		}
 	}
 
-	//CONTINUAR NA QUINTA!!!
+	
 	public boolean isNomeProdutoDuplicado(String nome) throws Exception {
 		String sql = "SELECT COUNT(1) AS qtd FROM produto WHERE nome = '" + nome + "'";
 		

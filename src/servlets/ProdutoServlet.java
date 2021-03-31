@@ -27,13 +27,11 @@ public class ProdutoServlet extends HttpServlet {
 			String idProduto = request.getParameter("prod");
 
 			if (acao.equalsIgnoreCase("listarTodos")) {
-
 				RequestDispatcher view = request.getRequestDispatcher("CadastroProduto.jsp");
 				request.setAttribute("produto", daoProduto.listar());
 				view.forward(request, response);
 
 			} else if (acao.equalsIgnoreCase("delete")) {
-
 				daoProduto.deletar(idProduto);
 				request.setAttribute("msg", "Deletado com sucesso!");
 				

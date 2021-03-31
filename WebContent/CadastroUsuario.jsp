@@ -5,7 +5,7 @@
 <html>
 
 <head>
-<meta charset="ISO-8859-1"  name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="ISO-8859-1">
 <title>Cadastro de Usuário</title>
 <link rel="stylesheet" href="resources/css/cadastro.css">
 
@@ -109,6 +109,7 @@
       <th>IBGE</th>
       <th>Deletar</th>
       <th>Editar</th>
+      <th>Fones</th>
     </tr>
     <c:forEach items="${usuario}" var="user">
 
@@ -133,6 +134,8 @@
             title="Excluir"></a>
         <td><a href="salvarUsuario?acao=editar&user=${user.id}"><img
             src="resources/img/editar.png" alt="Editar" title="Editar" /></a>
+        <td><a href="salvarTelefone?acao=listarTodos&user=${user.id}"><img
+        src="resources/img/phone20px.png" alt="Telefones" title="Telefones" /></a>
       </tr>
     </c:forEach>
   </table>
