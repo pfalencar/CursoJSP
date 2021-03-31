@@ -57,4 +57,26 @@ CREATE DATABASE "curso-jsp"
 	  CACHE 1;
 	ALTER TABLE public.produto_id_seq
 	  OWNER TO postgres;
+	  
+	CREATE SEQUENCE public.fonesequence
+	  INCREMENT 1
+	  MINVALUE 1
+	  MAXVALUE 9223372036854775807
+	  START 1
+	  CACHE 1;
+	ALTER TABLE public.fonesequence OWNER TO postgres;
+
+	CREATE TABLE telefone (
+	  id bigint NOT NULL DEFAULT nextval('fonesequence'::regclass),
+	  numero character varying(200) NOT NULL,
+	  tipo character varying(200) NOT NULL,
+	  usuario bigint NOT NULL,
+	  CONSTRAINT fone_pkey PRIMARY KEY (id)
+	)
+	WITH (OIDS=FALSE);
+	ALTER TABLE telefone OWNER TO postgres;
+
+	INSERT INTO telefone (numero, tipo, usuario) VALUES ('2038 9384', 'Casa', '79');
+	SELECT * FROM telefone;
+	DELETE FROM telefone WHERE id = 1;
 	
