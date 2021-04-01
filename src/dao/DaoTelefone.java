@@ -42,8 +42,8 @@ public class DaoTelefone {
 
 	}
 
-	public List<Telefone> listar() {
-		String sql = "SELECT * FROM telefone";
+	public List<Telefone> listar(Long usuario) {
+		String sql = "SELECT * FROM telefone WHERE usuario = " + usuario;
 
 		List<Telefone> listaTelefones = new ArrayList<Telefone>();
 
@@ -70,7 +70,7 @@ public class DaoTelefone {
 	}
 
 	public void deletar(String id) {
-		String sql = "DELETE FROM telefone WHERE id = ?" + id;
+		String sql = "DELETE FROM telefone WHERE id = " + id;
 
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -87,52 +87,5 @@ public class DaoTelefone {
 		}
 	}
 
-	public Telefone consultar(String idTelefone) {
-		String sql = "SELECT * FROM telefone WHERE id = " + idTelefone;
-		
-		try {
-			PreparedStatement preparedStatement = connection.prepareStatement(sql);
-			ResultSet resultSet = preparedStatement.executeQuery();
-
-			if (resultSet.next()) {
-				Telefone telefone = new Telefone();
-				
-				telefone.setId( resultSet.getLong("id") );
-				telefone.setNumero( resultSet.getString("numero") );
-				telefone.setTipo( resultSet.getString("tipo") );
-				telefone.setUsuario( resultSet.getLong("usuario") );
-				
-				return telefone;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public void atualizar (Telefone telefone) {
-		String sql = "UPDATE telefone SET numero = ?, tipo = ?, usuario = ? WHERE id = " + telefone.getId();
-		
-		try {
-			PreparedStatement preparedStatement = connection.prepareStatement(sql);
-			
-			preparedStatement.setString( 1, telefone.getNumero() );
-			preparedStatement.setString( 2, telefone.getTipo() );
-			preparedStatement.setLong( 3, telefone.getUsuario() );
-			
-			preparedStatement.executeUpdate();
-			connection.commit();
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
-		}
-		
-				
-	}
 
 }

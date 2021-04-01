@@ -98,9 +98,7 @@
     <tr>
       <th>Id</th>
       <th>Login</th>
-      <th>Senha</th>
       <th>Nome</th>
-      <th>Fone</th>
       <th>Cep</th>
       <th>Rua</th>
       <th>Bairro</th>
@@ -118,9 +116,7 @@
         <!-- "user.id" são os nomes do objeto! -->
         <td><c:out value="${user.id}"></c:out></td>
         <td><c:out value="${user.login}"></c:out></td>
-        <td><c:out value="${user.senha}"></c:out></td>
         <td><c:out value="${user.nome}"></c:out></td>
-        <td><c:out value="${user.fone}"></c:out></td>
         <td><c:out value="${user.cep}"></c:out></td>
         <td><c:out value="${user.rua}"></c:out></td>
         <td><c:out value="${user.bairro}"></c:out></td>
@@ -134,7 +130,7 @@
             title="Excluir"></a>
         <td><a href="salvarUsuario?acao=editar&user=${user.id}"><img
             src="resources/img/editar.png" alt="Editar" title="Editar" /></a>
-        <td><a href="salvarTelefone?acao=listarTodos&user=${user.id}"><img
+        <td><a href="salvarTelefone?acao=listarTelefones&user=${user.id}"><img
         src="resources/img/phone20px.png" alt="Telefones" title="Telefones" /></a>
       </tr>
     </c:forEach>

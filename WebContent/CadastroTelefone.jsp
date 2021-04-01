@@ -12,6 +12,7 @@
 </head>
 
 <body>
+  <a href="AcessoLiberado.jsp">Início</a>
   <a href="index.jsp">Sair</a>
   <h1>Cadastro de Telefones</h1>
 
@@ -86,7 +87,7 @@
         <td><c:out value="${userEscolhido.id}"></c:out></td>
         <td><c:out value="${userEscolhido.nome}"></c:out></td>
 
-        <td><a href="salvarTelefone?acao=delete&user=${fone.id}"><img
+        <td><a href="salvarTelefone?acao=delete&foneId=${fone.id}"><img
             src="resources/img/lixeira.png" alt="Excluir"
             title="Excluir"></a>
         </td>

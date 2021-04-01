@@ -28,35 +28,35 @@ public class TelefoneServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
-			String user = request.getParameter("user");
-			String acao = request.getParameter("acao");
-			String idTelefone = request.getParameter("fone");
-			
 
-			if (acao.equalsIgnoreCase("listarTodos")) {
+			String acao = request.getParameter("acao");
+
+			if (acao.equalsIgnoreCase("listarTelefones")) {
 				
+				String user = request.getParameter("user");
 				BeanCursoJsp usuario = daoUsuario.consultar(user);
-				
+
 				request.getSession().setAttribute("userEscolhido", usuario);
 				request.setAttribute("userEscolhido", usuario);
-				
+
 				RequestDispatcher view = request.getRequestDispatcher("CadastroTelefone.jsp");
-				request.setAttribute("telefone", daoTelefone.listar());
+				request.setAttribute("telefone", daoTelefone.listar(usuario.getId()));
 				view.forward(request, response);
 
-			} else if (acao.equalsIgnoreCase("delete")) {
-				daoTelefone.deletar(idTelefone);
 				
-//			} else {
-//
-//				RequestDispatcher view = request.getRequestDispatcher("CadastroTelefone.jsp");
-//
-//				// telefone é a lista que estou carregando do BD e vou colocar em "${telefone}"
-//				// na página CadastroTelefone.jsp
-//				request.setAttribute("telefone", daoTelefone.listar());
-//				view.forward(request, response);
-			}
+			} else if (acao.equalsIgnoreCase("delete")) {
+				
+				String idTelefone = request.getParameter("foneId");
+				daoTelefone.deletar(idTelefone);
+				request.setAttribute("msg", "Deletado com sucesso!");
+				
+				BeanCursoJsp beanCursoJsp = (BeanCursoJsp) request.getSession().getAttribute("userEscolhido");
 
+				RequestDispatcher view = request.getRequestDispatcher("CadastroTelefone.jsp");
+				request.setAttribute("telefone", daoTelefone.listar(beanCursoJsp.getId()));
+				view.forward(request, response);
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -78,11 +78,14 @@ public class TelefoneServlet extends HttpServlet {
 
 		daoTelefone.salvar(telefone);
 
+		request.getSession().setAttribute("userEscolhido", beanCursoJsp);
+		request.setAttribute("userEscolhido", beanCursoJsp);
+
 		RequestDispatcher view = request.getRequestDispatcher("CadastroTelefone.jsp");
 
 		// telefone é a lista que estou carregando do BD e vou colocar em "${telefone}"
 		// na página CadastroTelefone.jsp
-		request.setAttribute("telefone", daoTelefone.listar());
+		request.setAttribute("telefone", daoTelefone.listar(usuarioId));
 		request.setAttribute("msg", "Salvo com sucesso!");
 		view.forward(request, response);
 	}
