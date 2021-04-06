@@ -6,13 +6,14 @@ public class BeanCursoJsp {
 	private String login;
 	private String senha;
 	private String nome;
-	private String fone;
 	private String cep;
 	private String rua;
 	private String bairro;
 	private String cidade;
 	private String estado;
 	private String ibge;
+	private String foto;
+	private String contentType;
 	
 	
 	public Long getId() {
@@ -38,12 +39,6 @@ public class BeanCursoJsp {
 	}
 	public void setNome(String nome) {
 		this.nome = nome;
-	}
-	public String getFone() {
-		return fone;
-	}
-	public void setFone(String fone) {
-		this.fone = fone;
 	}
 	public String getCep() {
 		return cep;
@@ -80,6 +75,18 @@ public class BeanCursoJsp {
 	}
 	public void setIbge(String ibge) {
 		this.ibge = ibge;
+	}
+	public String getFoto() {
+		return foto;
+	}
+	public void setFoto(String fotoBase64) {
+		this.foto = fotoBase64;
+	}
+	public String getContentType() {
+		return contentType;
+	}
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
 	}
 	
 }

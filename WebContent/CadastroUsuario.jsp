@@ -24,7 +24,7 @@
   <h3 class="msg">${msg}</h3>
 
   <form action="salvarUsuario" method="post" id="formUser"
-    onsubmit="return validarCampos() ? true : false">
+    onsubmit="return validarCampos() ? true : false;" enctype="multipart/form-data" >
     <ul class="form-style-1">
       <table>
         
@@ -32,15 +32,15 @@
           <td>Código:</td>
           <td><input type="text" readonly="readonly" id="id"
             name="id" value="${user.id}" class="field-long"></td>
-          <td>Cep:</td>
-          <td><input type="text" id="cep" name="cep"
-            value="${user.cep}" onblur="consultarCep()"></td>
+            <td>Estado:</td>
+          <td><input type="text" id="uf" name="uf"
+            value="${user.estado}"></td>
         </tr>
 
         <tr>
           <td>Login:</td>
           <td><input type="text" id="login" name="login"
-            value="${user.login}"></td>
+            value="${user.login}" placeholder="Insira um login"></td>
           <td>Rua:</td>
           <td><input type="text" id="rua" name="rua"
             value="${user.rua}"></td>
@@ -49,7 +49,7 @@
         <tr>
           <td>Senha:</td>
           <td><input type="password" id="senha" name="senha"
-            value="${user.senha}" class="field-long"></td>
+            value="${user.senha}" class="field-long" placeholder="Digite uma senha"></td>
             <td>Bairro:</td>
           <td><input type="text" id="bairro" name="bairro"
             value="${user.bairro}"></td>
@@ -58,31 +58,30 @@
         <tr>
           <td>Nome:</td>
           <td><input type="text" id="nome" name="nome"
-            value="${user.nome}"></td>
+            value="${user.nome}" placeholder="Digite o seu nome"></td>
             <td>Cidade:</td>
           <td><input type="text" id="cidade" name="cidade"
             value="${user.cidade}"></td>
         </tr>
 
-        <tr>
-          <td>Fone:</td>
-          <td><input type="text" id="fone" name="fone"
-            value="${user.fone}"></td>
-            <td>Estado:</td>
-          <td><input type="text" id="uf" name="uf"
-            value="${user.estado}"></td>
-        </tr>
-
-        <tr>
+        <tr>           
+          <td>Cep:</td>
+          <td><input type="text" id="cep" name="cep"
+            value="${user.cep}" onblur="consultarCep()" placeholder="Digite um cep válido"></td> 
           <td>IBGE:</td>
           <td><input type="text" id="ibge" name="ibge"
             value="${user.ibge}"></td>
         </tr>
         
         <tr>
+          <td>Foto: </td>
+          <td><input type="file" name="foto" value="Foto" /> </td>
+        </tr>
+        
+        <tr>
           <td></td>
-          <td><input type="submit" value="Salvar" /> <input
-            type="submit" value="Cancelar"
+          <td><input type="submit" value="Salvar" /> 
+          <input type="submit" value="Cancelar"
             onclick="document.getElementById('formUser').action='salvarUsuario?acao=reset'" />
           </td>
         </tr>
@@ -91,10 +90,9 @@
 
     </ul>
   </form>
+  
   <table id="customers">
-    <caption>
-      <h3>Usuários Cadastrados</h3>
-    </caption>
+    <caption><h3>Usuários Cadastrados</h3></caption>
     <tr>
       <th>Id</th>
       <th>Login</th>
@@ -109,9 +107,8 @@
       <th>Editar</th>
       <th>Fones</th>
     </tr>
+    
     <c:forEach items="${usuario}" var="user">
-
-
       <tr>
         <!-- "user.id" são os nomes do objeto! -->
         <td><c:out value="${user.id}"></c:out></td>
@@ -121,8 +118,7 @@
         <td><c:out value="${user.rua}"></c:out></td>
         <td><c:out value="${user.bairro}"></c:out></td>
         <td><c:out value="${user.cidade}"></c:out></td>
-        <td><c:out value="${user.estado}"></c:out></td>
-        <!-- "user" é a entidade, por isso ".estado", que é o atributo. -->
+        <td><c:out value="${user.estado}"></c:out></td> <!-- "user" é a entidade, por isso ".estado", que é o atributo. -->
         <td><c:out value="${user.ibge}"></c:out></td>
 
         <td><a href="salvarUsuario?acao=delete&user=${user.id}"><img
@@ -133,9 +129,29 @@
         <td><a href="salvarTelefone?acao=listarTelefones&user=${user.id}"><img
         src="resources/img/phone20px.png" alt="Telefones" title="Telefones" /></a>
       </tr>
+      
     </c:forEach>
+    
   </table>
+  
   <script type="text/javascript">
+			function validarCampos() {
+				if (document.getElementById("login").value != '') {
+					alert(document.getElementById("login").value);
+				} 
+				if (document.getElementById("senha").value != '') {
+					alert(document.getElementById("senha").value);
+					
+				}
+				if (document.getElementById("nome").value != '') {
+					alert(document.getElementById("nome").value);
+					
+				}
+				return true;
+			}
+			
+			/*
+			
 			function validarCampos() {
 				if (document.getElementById("login").value == '') {
 					alert("Login não pode ser vazio.");
@@ -146,12 +162,11 @@
 				} else if (document.getElementById("nome").value == '') {
 					alert("Nome não pode ser vazio.");
 					return false;
-				} else if (document.getElementById('fone').value == '') {
-					alert("Telefone não pode ser vazio.");
-					return false;
 				}
 				return true;
 			}
+			
+			*/
 
 			function consultarCep() {
 				var cep = $("#cep").val(); //"#" é o id do cep	

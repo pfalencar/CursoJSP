@@ -21,7 +21,7 @@ public class DaoUsuario {
 	}
 
 	public void salvar(BeanCursoJsp beanCursoJsp) {
-		String sql = "INSERT INTO usuario (login, senha, nome, cep, rua, bairro, cidade, uf, ibge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO usuario (login, senha, nome, cep, rua, bairro, cidade, uf, ibge, fotobase64, contenttype) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -45,39 +45,51 @@ public class DaoUsuario {
 			}
 
 			if (beanCursoJsp.getCep() != null) {
-				preparedStatement.setString(5, beanCursoJsp.getCep());
+				preparedStatement.setString(4, beanCursoJsp.getCep());
 			} else {
 				JOptionPane.showMessageDialog(null, "Insira um cep válido.");
 			}
 
 			if (beanCursoJsp.getRua() != null) {
-				preparedStatement.setString(6, beanCursoJsp.getRua());
+				preparedStatement.setString(5, beanCursoJsp.getRua());
 			} else {
 				JOptionPane.showMessageDialog(null, "Insira uma rua válida.");
 			}
 
 			if (beanCursoJsp.getBairro() != null) {
-				preparedStatement.setString(7, beanCursoJsp.getBairro());
+				preparedStatement.setString(6, beanCursoJsp.getBairro());
 			} else {
 				JOptionPane.showMessageDialog(null, "Insira um bairro válido.");
 			}
 
 			if (beanCursoJsp.getCidade() != null) {
-				preparedStatement.setString(8, beanCursoJsp.getCidade());
+				preparedStatement.setString(7, beanCursoJsp.getCidade());
 			} else {
 				JOptionPane.showMessageDialog(null, "Insira uma cidade válida.");
 			}
 
 			if (beanCursoJsp.getEstado() != null) {
-				preparedStatement.setString(9, beanCursoJsp.getEstado());
+				preparedStatement.setString(8, beanCursoJsp.getEstado());
 			} else {
 				JOptionPane.showMessageDialog(null, "Insira um estado válido.");
 			}
 
 			if (beanCursoJsp.getIbge() != null) {
-				preparedStatement.setString(10, beanCursoJsp.getIbge());
+				preparedStatement.setString(9, beanCursoJsp.getIbge());
 			} else {
 				JOptionPane.showMessageDialog(null, "Insira um IBGE válido.");
+			}
+			
+			if (beanCursoJsp.getFoto() != null) {
+				preparedStatement.setString(10, beanCursoJsp.getFoto());
+			} else {
+				JOptionPane.showMessageDialog(null, "Insira a foto.");
+			}
+			
+			if (beanCursoJsp.getContentType() != null) {
+				preparedStatement.setString(11, beanCursoJsp.getContentType());
+			} else {
+				JOptionPane.showMessageDialog(null, "Insira o tipo de dado.");
 			}
 
 			preparedStatement.execute();
@@ -107,7 +119,7 @@ public class DaoUsuario {
 
 			beanCursoJsp.setId(resultSet.getLong("id"));
 			beanCursoJsp.setLogin(resultSet.getString("login"));
-//			beanCursoJsp.setSenha(resultSet.getString("senha"));
+			beanCursoJsp.setSenha(resultSet.getString("senha"));
 			beanCursoJsp.setNome(resultSet.getString("nome"));
 			beanCursoJsp.setCep(resultSet.getString("cep"));
 			beanCursoJsp.setRua(resultSet.getString("rua"));
@@ -115,7 +127,9 @@ public class DaoUsuario {
 			beanCursoJsp.setCidade(resultSet.getString("cidade"));
 			beanCursoJsp.setEstado(resultSet.getString("uf"));
 			beanCursoJsp.setIbge(resultSet.getString("ibge"));
-
+			beanCursoJsp.setFoto(resultSet.getString("fotobase64"));
+			beanCursoJsp.setContentType(resultSet.getString("contentType"));
+			
 			lista.add(beanCursoJsp);
 		}
 		return lista;
@@ -156,7 +170,7 @@ public class DaoUsuario {
 
 				beanCursoJsp.setId(resultSet.getLong("id"));
 				beanCursoJsp.setLogin(resultSet.getString("login"));
-//				beanCursoJsp.setSenha(resultSet.getString("senha"));
+				beanCursoJsp.setSenha(resultSet.getString("senha"));
 				beanCursoJsp.setNome(resultSet.getString("nome"));
 				beanCursoJsp.setCep(resultSet.getString("cep"));
 				beanCursoJsp.setRua(resultSet.getString("rua"));
@@ -164,7 +178,9 @@ public class DaoUsuario {
 				beanCursoJsp.setCidade(resultSet.getString("cidade"));
 				beanCursoJsp.setEstado(resultSet.getString("uf"));
 				beanCursoJsp.setIbge(resultSet.getString("ibge"));
-
+				beanCursoJsp.setFoto(resultSet.getString("fotobase64"));
+				beanCursoJsp.setContentType(resultSet.getString("contentType"));
+				
 				return beanCursoJsp;
 			}
 		} catch (Exception e) {
@@ -232,7 +248,7 @@ public class DaoUsuario {
 
 	public void atualizar(BeanCursoJsp beanCursoJsp) {
 		try {
-			String sql = "UPDATE usuario SET login = ?, senha = ?, nome = ?, cep = ?, rua = ?, bairro = ?, cidade = ?, uf = ?, ibge = ?  WHERE id = "
+			String sql = "UPDATE usuario SET login = ?, senha = ?, nome = ?, cep = ?, rua = ?, bairro = ?, cidade = ?, uf = ?, ibge = ?, fotobase64 = ?, contenttype = ? WHERE id = "
 					+ beanCursoJsp.getId();
 
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -246,6 +262,8 @@ public class DaoUsuario {
 			preparedStatement.setString(8, beanCursoJsp.getCidade());
 			preparedStatement.setString(9, beanCursoJsp.getEstado());
 			preparedStatement.setString(10, beanCursoJsp.getIbge());
+			preparedStatement.setString(11, beanCursoJsp.getFoto());
+			preparedStatement.setString(12, beanCursoJsp.getContentType());
 
 			preparedStatement.executeUpdate();
 

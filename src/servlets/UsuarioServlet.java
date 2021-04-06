@@ -1,18 +1,29 @@
 package servlets;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.tomcat.util.codec.binary.Base64;
 
 import beans.BeanCursoJsp;
 import dao.DaoUsuario;
 
 @WebServlet("/salvarUsuario")
+@MultipartConfig
 public class UsuarioServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -84,7 +95,6 @@ public class UsuarioServlet extends HttpServlet {
 			String login = request.getParameter("login");
 			String senha = request.getParameter("senha");
 			String nome = request.getParameter("nome");
-			String fone = request.getParameter("fone");			
 			String cep = request.getParameter("cep");
 			String rua = request.getParameter("rua");
 			String bairro = request.getParameter("bairro");
@@ -94,19 +104,41 @@ public class UsuarioServlet extends HttpServlet {
 
 			BeanCursoJsp beanCursoJsp = new BeanCursoJsp();
 
-			beanCursoJsp.setId(!id.isEmpty() ? Long.parseLong(id) : null);
-			beanCursoJsp.setLogin(!login.isEmpty() || !login.isBlank() ? login : null);
-			beanCursoJsp.setSenha(!senha.isEmpty() || !senha.isBlank() ? senha : null);
-			beanCursoJsp.setNome(!nome.isEmpty() || !nome.isBlank() ? nome : null);
-			beanCursoJsp.setFone(!fone.isEmpty() || !fone.isBlank() ? fone : null);
-			beanCursoJsp.setCep(!cep.isEmpty() || !cep.isBlank() ? cep : null);
-			beanCursoJsp.setRua(!rua.isEmpty() || !rua.isBlank() ? rua : null);
-			beanCursoJsp.setBairro(!bairro.isEmpty() || !bairro.isBlank() ? bairro : null);
-			beanCursoJsp.setCidade(!cidade.isEmpty() || !cidade.isBlank() ? cidade : null);
-			beanCursoJsp.setEstado(!estado.isEmpty() || !estado.isBlank() ? estado : null);
-			beanCursoJsp.setIbge( !ibge.isEmpty() || !ibge.isBlank() ? ibge : null);
+			try {
+				beanCursoJsp.setId(!id.isEmpty() && !id.isBlank() && id != null ? Long.parseLong(id) : null);
+				beanCursoJsp.setLogin(!login.isEmpty() || !login.isBlank() ? login : null);
+				beanCursoJsp.setSenha(!senha.isEmpty() || !senha.isBlank() ? senha : null);
+				beanCursoJsp.setNome(!nome.isEmpty() || !nome.isBlank() ? nome : null);
+				beanCursoJsp.setCep(!cep.isEmpty() || !cep.isBlank() ? cep : null);
+				beanCursoJsp.setRua(!rua.isEmpty() || !rua.isBlank() ? rua : null);
+				beanCursoJsp.setBairro(!bairro.isEmpty() || !bairro.isBlank() ? bairro : null);
+				beanCursoJsp.setCidade(!cidade.isEmpty() || !cidade.isBlank() ? cidade : null);
+				beanCursoJsp.setEstado(!estado.isEmpty() || !estado.isBlank() ? estado : null);
+				beanCursoJsp.setIbge( !ibge.isEmpty() || !ibge.isBlank() ? ibge : null);
+				
+			} catch (Exception f) {
+				f.printStackTrace();
+			}
 
 			try {
+				
+				/* INICIO - File upload de imagens e pdf */
+				
+				//converto uma inputStream para um array de bytes e depois converter ele para base64, passar para o objeto e continuar o fluxo para salvar.
+				
+				if (ServletFileUpload.isMultipartContent(request)) { //valida se esse é um formulário de Upload
+					
+					Part imagemFoto = request.getPart("foto");
+					
+					InputStream inputStreamFoto = imagemFoto.getInputStream();
+					byte[] fotoEmByte = converterStreamToByte(inputStreamFoto);
+					String fotoBase64 = new Base64().encodeBase64String(fotoEmByte);
+					
+					beanCursoJsp.setFoto(fotoBase64);
+					beanCursoJsp.setContentType(imagemFoto.getContentType());
+				}
+				
+				 /* FIM - File upload de imagens e pdf */
 
 				if ( login == null || login.isEmpty() ) {
 					request.setAttribute("msg", "Login é obrigatório!");
@@ -118,10 +150,6 @@ public class UsuarioServlet extends HttpServlet {
 					
 				} else if ( nome == null || nome.isEmpty() ) {
 					request.setAttribute("msg", "Nome é obrigatório!");
-					request.setAttribute("user", beanCursoJsp);
-					
-				} else if ( fone == null || fone.isEmpty() ) {
-					request.setAttribute("msg", "Telefone é obrigatório!");
 					request.setAttribute("user", beanCursoJsp);
 					
 				} else if ( cep == null || cep.isEmpty() ) {
@@ -189,16 +217,16 @@ public class UsuarioServlet extends HttpServlet {
 
 	}
 
-	@Override
-	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		super.doPut(req, resp);
+	// Converte a entrada de fluxo de dados da imagem para um array de bytes
+	private static byte[] converterStreamToByte (InputStream imagem) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		
+		int reads = imagem.read();
+		while (reads != -1) {
+			baos.write(reads);
+			reads = imagem.read();
+		}		
+		return baos.toByteArray();		
 	}
-
-	@Override
-	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		super.doDelete(req, resp);
-	}
-
+	
 }
