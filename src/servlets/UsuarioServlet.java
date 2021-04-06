@@ -1,8 +1,9 @@
 package servlets;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.io.OutputStream;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,8 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -44,7 +43,6 @@ public class UsuarioServlet extends HttpServlet {
 			if (acao.equalsIgnoreCase("delete")) {
 
 				daoUsuario.deletar(user);
-
 				request.setAttribute("msg", "Deletado com sucesso!");
 
 				// depois que deletou eu carrego os usuários e volto para a mesma página
@@ -67,6 +65,38 @@ public class UsuarioServlet extends HttpServlet {
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
 				request.setAttribute("usuario", daoUsuario.listar());
 				view.forward(request, response);
+			
+			} else if (acao.equalsIgnoreCase("download")) {
+				BeanCursoJsp beanCursoJsp = daoUsuario.consultar(user);
+				
+				if (beanCursoJsp != null) {
+					
+					//usando regex para pegar a extensão que está depois da "/" no contentType. O split coloca em um array. Escolho a segunda posição: [1] para pegar o que vem depois da "/"
+					String extensaoArquivo = beanCursoJsp.getContentType().split("\\/")[1];
+					
+					//vou fazer o movimento de download sem abrir uma nova tela.
+					response.setHeader("Content-Disposition", "attachment;filename=arquivo." + extensaoArquivo);
+					
+					//tem que colocar a foto num array de bytes. Converte a base64 da imagem do banco para byte[]
+					byte[] imageFotoBytes = new Base64().decodeBase64(beanCursoJsp.getFoto());
+					
+					//colocar os bytes em um objeto de entrada (um fluxo de entrada) para processar. O InputStream é usado para receber os bytes.
+					InputStream inputStream = new ByteArrayInputStream(imageFotoBytes);
+					
+					//escrever na resposta
+					/* INÍCIO DA RESPOSTA PARA O NAVEGADOR */
+					int read = 0;
+					byte[] bytes = new byte[1024];
+					OutputStream outputStream = response.getOutputStream();
+					
+					//enquanto a minha variável de controle "read" estiver lendo os bytes, é porque têm dados nele, ou seja é != -1
+					while ( (read = inputStream.read(bytes)) != -1 ) {
+						outputStream.write(bytes, 0, read);
+					}
+					outputStream.flush();
+					outputStream.close();
+					
+				}
 			}
 
 		} catch (Exception e) {

@@ -15,6 +15,12 @@ public class BeanCursoJsp {
 	private String foto;
 	private String contentType;
 	
+	private String tempFotoUser;
+	
+	public String getTempFotoUser() {
+		tempFotoUser = "data:" + contentType + ";base64," + foto;
+		return tempFotoUser;
+	}
 	
 	public Long getId() {
 		return id;

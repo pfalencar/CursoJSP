@@ -254,16 +254,16 @@ public class DaoUsuario {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
 			preparedStatement.setString(1, beanCursoJsp.getLogin());
-//			preparedStatement.setString(2, beanCursoJsp.getSenha());
+			preparedStatement.setString(2, beanCursoJsp.getSenha());
 			preparedStatement.setString(3, beanCursoJsp.getNome());
-			preparedStatement.setString(5, beanCursoJsp.getCep());
-			preparedStatement.setString(6, beanCursoJsp.getRua());
-			preparedStatement.setString(7, beanCursoJsp.getBairro());
-			preparedStatement.setString(8, beanCursoJsp.getCidade());
-			preparedStatement.setString(9, beanCursoJsp.getEstado());
-			preparedStatement.setString(10, beanCursoJsp.getIbge());
-			preparedStatement.setString(11, beanCursoJsp.getFoto());
-			preparedStatement.setString(12, beanCursoJsp.getContentType());
+			preparedStatement.setString(4, beanCursoJsp.getCep());
+			preparedStatement.setString(5, beanCursoJsp.getRua());
+			preparedStatement.setString(6, beanCursoJsp.getBairro());
+			preparedStatement.setString(7, beanCursoJsp.getCidade());
+			preparedStatement.setString(8, beanCursoJsp.getEstado());
+			preparedStatement.setString(9, beanCursoJsp.getIbge());
+			preparedStatement.setString(10, beanCursoJsp.getFoto());
+			preparedStatement.setString(11, beanCursoJsp.getContentType());
 
 			preparedStatement.executeUpdate();
 

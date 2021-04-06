@@ -96,6 +96,7 @@
     <tr>
       <th>Id</th>
       <th>Login</th>
+      <th>Foto</th>
       <th>Nome</th>
       <th>Cep</th>
       <th>Rua</th>
@@ -113,6 +114,7 @@
         <!-- "user.id" são os nomes do objeto! -->
         <td><c:out value="${user.id}"></c:out></td>
         <td><c:out value="${user.login}"></c:out></td>
+        <td><a href="salvarUsuario?acao=download&user=${user.id}" ><img src='<c:out value="${user.tempFotoUser}" />' alt="Imagem User" title="Imagem User" width="32px" height="32px"/></a></td>
         <td><c:out value="${user.nome}"></c:out></td>
         <td><c:out value="${user.cep}"></c:out></td>
         <td><c:out value="${user.rua}"></c:out></td>
@@ -124,8 +126,8 @@
         <td><a href="salvarUsuario?acao=delete&user=${user.id}"><img
             src="resources/img/lixeira.png" alt="Excluir"
             title="Excluir"></a>
-        <td><a href="salvarUsuario?acao=editar&user=${user.id}"><img
-            src="resources/img/editar.png" alt="Editar" title="Editar" /></a>
+        <td><a href="salvarUsuario?acao=editar&user=${user.id}">
+        <img src="resources/img/editar.png" alt="Editar" title="Editar" /></a>
         <td><a href="salvarTelefone?acao=listarTelefones&user=${user.id}"><img
         src="resources/img/phone20px.png" alt="Telefones" title="Telefones" /></a>
       </tr>
@@ -135,22 +137,6 @@
   </table>
   
   <script type="text/javascript">
-			function validarCampos() {
-				if (document.getElementById("login").value != '') {
-					alert(document.getElementById("login").value);
-				} 
-				if (document.getElementById("senha").value != '') {
-					alert(document.getElementById("senha").value);
-					
-				}
-				if (document.getElementById("nome").value != '') {
-					alert(document.getElementById("nome").value);
-					
-				}
-				return true;
-			}
-			
-			/*
 			
 			function validarCampos() {
 				if (document.getElementById("login").value == '') {
@@ -166,8 +152,7 @@
 				return true;
 			}
 			
-			*/
-
+			
 			function consultarCep() {
 				var cep = $("#cep").val(); //"#" é o id do cep	
 
