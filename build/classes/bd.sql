@@ -23,6 +23,14 @@ CREATE DATABASE "curso-jsp"
 	  login character varying(255) NOT NULL,
 	  senha character varying(255) NOT NULL,
 	  nome character varying(500),
+	  cep character varying(200),
+	  rua character varying(200),
+	  bairro character varying(200),
+	  cidade character varying(200),
+	  uf character varying(200),
+	  ibge character varying(200),
+	  fotobase64 text,
+	  contenttype text,
 	  CONSTRAINT usuario_id PRIMARY KEY (id)
 	)
 	WITH (
@@ -30,10 +38,7 @@ CREATE DATABASE "curso-jsp"
 	);
 	ALTER TABLE public.usuario
 	  OWNER TO postgres;
-	  
-	INSERT INTO usuario (id, login, senha, nome) VALUES (1, 'admin', 'admin', 'Administrador');
-	INSERT INTO usuario (id, login, senha, nome) VALUES (2, 'pati', 'ppp', 'Patricia');
-	
+
 	
 	CREATE TABLE public.produto
 	(
@@ -79,4 +84,6 @@ CREATE DATABASE "curso-jsp"
 	INSERT INTO telefone (numero, tipo, usuario) VALUES ('2038 9384', 'Casa', '79');
 	SELECT * FROM telefone;
 	DELETE FROM telefone WHERE id = 1;
+	
+	
 	

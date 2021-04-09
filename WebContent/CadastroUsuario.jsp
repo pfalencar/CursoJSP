@@ -75,7 +75,20 @@
         
         <tr>
           <td>Foto: </td>
-          <td><input type="file" name="foto" value="Foto" /> </td>
+          <td>
+            <input type="file" name="foto" />
+              <input type="text" name="fotoTemp" readonly="readonly" value="${user.foto}"/>
+              <input type="text" name="contentTypeFotoTemp" readonly="readonly" value="${user.contentType}"/>
+          </td>
+        </tr>
+        
+        <tr>
+          <td>Currículo: </td>
+          <td>
+            <input type="file" name="curriculo"/>
+              <input type="text" name="curriculoTemp" readonly="readonly" value="${user.curriculoBase64}"/> 
+              <input type="text" name="curriculoContentType" readonly="readonly" value="${user.contentTypeCurriculo}"/> 
+          </td>
         </tr>
         
         <tr>
@@ -97,6 +110,7 @@
       <th>Id</th>
       <th>Login</th>
       <th>Foto</th>
+      <th>Currículo</th>
       <th>Nome</th>
       <th>Cep</th>
       <th>Rua</th>
@@ -114,7 +128,8 @@
         <!-- "user.id" são os nomes do objeto! -->
         <td><c:out value="${user.id}"></c:out></td>
         <td><c:out value="${user.login}"></c:out></td>
-        <td><a href="salvarUsuario?acao=download&user=${user.id}" ><img src='<c:out value="${user.tempFotoUser}" />' alt="Imagem User" title="Imagem User" width="32px" height="32px"/></a></td>
+        <td><a href="salvarUsuario?acao=download&tipo=imagem&user=${user.id}" ><img src='<c:out value="${user.tempFotoUser}" />' alt="Imagem User" title="Imagem User" width="32px" height="32px"/></a></td>
+        <td><a href="salvarUsuario?acao=download&tipo=curriculo&user=${user.id}">Currículo</a></td>
         <td><c:out value="${user.nome}"></c:out></td>
         <td><c:out value="${user.cep}"></c:out></td>
         <td><c:out value="${user.rua}"></c:out></td>

@@ -47,7 +47,8 @@ public class UsuarioServlet extends HttpServlet {
 
 				// depois que deletou eu carrego os usuários e volto para a mesma página
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-				//"usuario" é a tabela da página, onde serão listados os usuários que estão no BD
+				// "usuario" é a tabela da página, onde serão listados os usuários que estão no
+				// BD
 				request.setAttribute("usuario", daoUsuario.listar());
 				view.forward(request, response);
 
@@ -56,7 +57,7 @@ public class UsuarioServlet extends HttpServlet {
 				BeanCursoJsp beanCursoJsp = daoUsuario.consultar(user);
 
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-				//"user" é 1 usuário que está nos campos da tela.
+				// "user" é 1 usuário que está nos campos da tela.
 				request.setAttribute("user", beanCursoJsp);
 				view.forward(request, response);
 
@@ -65,38 +66,62 @@ public class UsuarioServlet extends HttpServlet {
 				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
 				request.setAttribute("usuario", daoUsuario.listar());
 				view.forward(request, response);
-			
+
 			} else if (acao.equalsIgnoreCase("download")) {
 				BeanCursoJsp beanCursoJsp = daoUsuario.consultar(user);
-				
 				if (beanCursoJsp != null) {
-					
-					//usando regex para pegar a extensão que está depois da "/" no contentType. O split coloca em um array. Escolho a segunda posição: [1] para pegar o que vem depois da "/"
-					String extensaoArquivo = beanCursoJsp.getContentType().split("\\/")[1];
-					
-					//vou fazer o movimento de download sem abrir uma nova tela.
-					response.setHeader("Content-Disposition", "attachment;filename=arquivo." + extensaoArquivo);
-					
-					//tem que colocar a foto num array de bytes. Converte a base64 da imagem do banco para byte[]
-					byte[] imageFotoBytes = new Base64().decodeBase64(beanCursoJsp.getFoto());
-					
-					//colocar os bytes em um objeto de entrada (um fluxo de entrada) para processar. O InputStream é usado para receber os bytes.
-					InputStream inputStream = new ByteArrayInputStream(imageFotoBytes);
-					
-					//escrever na resposta
-					/* INÍCIO DA RESPOSTA PARA O NAVEGADOR */
-					int read = 0;
-					byte[] bytes = new byte[1024];
-					OutputStream outputStream = response.getOutputStream();
-					
-					//enquanto a minha variável de controle "read" estiver lendo os bytes, é porque têm dados nele, ou seja é != -1
-					while ( (read = inputStream.read(bytes)) != -1 ) {
-						outputStream.write(bytes, 0, read);
+
+					String conteudoTipo = "";
+					String arquivoBase64Objeto = null;
+					byte[] arquivoEmBytes = null;
+					InputStream arquivoEmInputStream = null;
+					String tipo = request.getParameter("tipo");
+
+					if (tipo.equalsIgnoreCase("imagem")) {
+						conteudoTipo = beanCursoJsp.getContentType();
+						arquivoBase64Objeto = beanCursoJsp.getFoto();
+						
+
+					} else if (tipo.equalsIgnoreCase("curriculo")) {
+						conteudoTipo = beanCursoJsp.getContentTypeCurriculo();
+						arquivoBase64Objeto = beanCursoJsp.getCurriculoBase64();
+						
 					}
-					outputStream.flush();
-					outputStream.close();
+
+					// usando regex para pegar a extensão que está depois da "/" no contentType. O
+					// split coloca em um array. Escolho a segunda posição: [1] para pegar o que vem
+					// depois da "/"
+					// vou fazer o movimento de download sem abrir uma nova tela. Vai baixar como arquivo.extensão
 					
+					if ( conteudoTipo == null || conteudoTipo == "" || conteudoTipo.isEmpty() || conteudoTipo.isBlank() || arquivoBase64Objeto == null || arquivoBase64Objeto == "" || arquivoBase64Objeto.isEmpty() || arquivoBase64Objeto.isBlank()) {
+						RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
+						request.setAttribute("msg", "Não há arquivo para download!");
+						request.setAttribute("usuario", daoUsuario.listar());
+						view.forward(request, response);
+
+					} else {
+						arquivoEmBytes = new Base64().decodeBase64(arquivoBase64Objeto); // tem que colocar a foto num array de bytes. Converte a base64 da imagem do banco para byte[]
+						response.setHeader("Content-Disposition", "attachment;filename=arquivo." + conteudoTipo.split("\\/")[1]);
+
+						// colocar os bytes em um objeto de entrada (um fluxo de entrada) p processar. O InputStream é usado para receber os bytes.
+						arquivoEmInputStream = new ByteArrayInputStream(arquivoEmBytes);
+
+						// escrever na resposta
+						/* INÍCIO DA RESPOSTA PARA O NAVEGADOR */
+						int read = 0;
+						byte[] bytes = new byte[1024];
+						OutputStream outputStream = response.getOutputStream();
+
+						// enquanto a minha variável de controle "read" estiver lendo os bytes, é porque
+						// têm dados nele, ou seja é != -1
+						while ((read = arquivoEmInputStream.read(bytes)) != -1) {
+							outputStream.write(bytes, 0, read);
+						}
+						outputStream.flush();
+						outputStream.close();
+					}
 				}
+
 			}
 
 		} catch (Exception e) {
@@ -144,48 +169,71 @@ public class UsuarioServlet extends HttpServlet {
 				beanCursoJsp.setBairro(!bairro.isEmpty() || !bairro.isBlank() ? bairro : null);
 				beanCursoJsp.setCidade(!cidade.isEmpty() || !cidade.isBlank() ? cidade : null);
 				beanCursoJsp.setEstado(!estado.isEmpty() || !estado.isBlank() ? estado : null);
-				beanCursoJsp.setIbge( !ibge.isEmpty() || !ibge.isBlank() ? ibge : null);
-				
+				beanCursoJsp.setIbge(!ibge.isEmpty() || !ibge.isBlank() ? ibge : null);
+
 			} catch (Exception f) {
 				f.printStackTrace();
 			}
 
 			try {
-				
-				/* INICIO - File upload de imagens e pdf */
-				
-				//converto uma inputStream para um array de bytes e depois converter ele para base64, passar para o objeto e continuar o fluxo para salvar.
-				
-				if (ServletFileUpload.isMultipartContent(request)) { //valida se esse é um formulário de Upload
-					
-					Part imagemFoto = request.getPart("foto");
-					
-					InputStream inputStreamFoto = imagemFoto.getInputStream();
-					byte[] fotoEmByte = converterStreamToByte(inputStreamFoto);
-					String fotoBase64 = new Base64().encodeBase64String(fotoEmByte);
-					
-					beanCursoJsp.setFoto(fotoBase64);
-					beanCursoJsp.setContentType(imagemFoto.getContentType());
-				}
-				
-				 /* FIM - File upload de imagens e pdf */
 
-				if ( login == null || login.isEmpty() ) {
+				/* INICIO - File upload de imagens e pdf */
+
+				// converto uma inputStream para um array de bytes e depois converter ele para
+				// base64, passar para o objeto e continuar o fluxo para salvar.
+
+				if (ServletFileUpload.isMultipartContent(request)) { // valida se esse é um formulário de Upload
+
+					Part imagemFoto = request.getPart("foto");
+
+					if (imagemFoto != null && imagemFoto.getInputStream().available() > 0) {
+
+						InputStream inputStreamFoto = imagemFoto.getInputStream();
+						byte[] fotoEmByte = converterStreamToByte(inputStreamFoto);
+						String fotoBase64 = new Base64().encodeBase64String(fotoEmByte);
+
+						beanCursoJsp.setFoto(fotoBase64);
+						beanCursoJsp.setContentType(imagemFoto.getContentType());
+
+					} else { // se não tiver nada no campo de foto, pega o que tem nos parâmetros "fotoTemp"
+										// e "contentTypeFotoTemp" e coloca no objeto
+						beanCursoJsp.setFoto(request.getParameter("fotoTemp"));
+						beanCursoJsp.setContentType(request.getParameter("contentTypeFotoTemp"));
+					}
+
+					/* Processa pdf */
+					Part arquivoCurriculo = request.getPart("curriculo");
+
+					if (arquivoCurriculo != null && arquivoCurriculo.getInputStream().available() > 0) {
+						String curriculoBase64 = new Base64()
+								.encodeBase64String(converterStreamToByte(arquivoCurriculo.getInputStream()));
+
+						beanCursoJsp.setCurriculoBase64(curriculoBase64);
+						beanCursoJsp.setContentTypeCurriculo(arquivoCurriculo.getContentType());
+					} else {
+						beanCursoJsp.setCurriculoBase64(request.getParameter("curriculoTemp"));
+						beanCursoJsp.setContentTypeCurriculo(request.getParameter("curriculoContentType"));
+					}
+				}
+
+				/* FIM - File upload de imagens e pdf */
+
+				if (login == null || login.isEmpty()) {
 					request.setAttribute("msg", "Login é obrigatório!");
 					request.setAttribute("user", beanCursoJsp);
-					
-				} else if ( senha == null || senha.isEmpty() ) {
+
+				} else if (senha == null || senha.isEmpty()) {
 					request.setAttribute("msg", "Senha é obrigatória!");
 					request.setAttribute("user", beanCursoJsp);
-					
-				} else if ( nome == null || nome.isEmpty() ) {
+
+				} else if (nome == null || nome.isEmpty()) {
 					request.setAttribute("msg", "Nome é obrigatório!");
 					request.setAttribute("user", beanCursoJsp);
-					
-				} else if ( cep == null || cep.isEmpty() ) {
+
+				} else if (cep == null || cep.isEmpty()) {
 					request.setAttribute("msg", "Cep é obrigatório!");
 					request.setAttribute("user", beanCursoJsp);
-										
+
 				} else if (id == null || id.isEmpty()) {
 
 					if (!daoUsuario.isLoginDuplicado(login)) {
@@ -226,7 +274,7 @@ public class UsuarioServlet extends HttpServlet {
 						request.setAttribute("user", beanCursoJsp);
 					}
 
-				} 
+				}
 
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -248,15 +296,15 @@ public class UsuarioServlet extends HttpServlet {
 	}
 
 	// Converte a entrada de fluxo de dados da imagem para um array de bytes
-	private static byte[] converterStreamToByte (InputStream imagem) throws IOException {
+	private static byte[] converterStreamToByte(InputStream imagem) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		
+
 		int reads = imagem.read();
 		while (reads != -1) {
 			baos.write(reads);
 			reads = imagem.read();
-		}		
-		return baos.toByteArray();		
+		}
+		return baos.toByteArray();
 	}
-	
+
 }

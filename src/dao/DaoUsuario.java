@@ -21,7 +21,7 @@ public class DaoUsuario {
 	}
 
 	public void salvar(BeanCursoJsp beanCursoJsp) {
-		String sql = "INSERT INTO usuario (login, senha, nome, cep, rua, bairro, cidade, uf, ibge, fotobase64, contenttype) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO usuario (login, senha, nome, cep, rua, bairro, cidade, uf, ibge, fotobase64, contenttype, curriculobase64, contenttypecurriculo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -89,7 +89,19 @@ public class DaoUsuario {
 			if (beanCursoJsp.getContentType() != null) {
 				preparedStatement.setString(11, beanCursoJsp.getContentType());
 			} else {
-				JOptionPane.showMessageDialog(null, "Insira o tipo de dado.");
+				JOptionPane.showMessageDialog(null, "Insira o tipo de dado da foto.");
+			}
+			
+			if (beanCursoJsp.getContentType() != null) {
+				preparedStatement.setString(12, beanCursoJsp.getCurriculoBase64());
+			} else {
+				JOptionPane.showMessageDialog(null, "Insira o currículo.");
+			}
+			
+			if (beanCursoJsp.getContentType() != null) {
+				preparedStatement.setString(13, beanCursoJsp.getContentTypeCurriculo());
+			} else {
+				JOptionPane.showMessageDialog(null, "Insira o tipo de dado do currículo.");
 			}
 
 			preparedStatement.execute();
@@ -128,7 +140,9 @@ public class DaoUsuario {
 			beanCursoJsp.setEstado(resultSet.getString("uf"));
 			beanCursoJsp.setIbge(resultSet.getString("ibge"));
 			beanCursoJsp.setFoto(resultSet.getString("fotobase64"));
-			beanCursoJsp.setContentType(resultSet.getString("contentType"));
+			beanCursoJsp.setContentType(resultSet.getString("contenttype"));
+			beanCursoJsp.setCurriculoBase64(resultSet.getString("curriculobase64"));
+			beanCursoJsp.setContentTypeCurriculo(resultSet.getString("contenttypecurriculo"));
 			
 			lista.add(beanCursoJsp);
 		}
@@ -179,7 +193,9 @@ public class DaoUsuario {
 				beanCursoJsp.setEstado(resultSet.getString("uf"));
 				beanCursoJsp.setIbge(resultSet.getString("ibge"));
 				beanCursoJsp.setFoto(resultSet.getString("fotobase64"));
-				beanCursoJsp.setContentType(resultSet.getString("contentType"));
+				beanCursoJsp.setContentType(resultSet.getString("contenttype"));
+				beanCursoJsp.setCurriculoBase64(resultSet.getString("curriculobase64"));
+				beanCursoJsp.setContentTypeCurriculo(resultSet.getString("contenttypecurriculo"));
 				
 				return beanCursoJsp;
 			}
@@ -248,7 +264,7 @@ public class DaoUsuario {
 
 	public void atualizar(BeanCursoJsp beanCursoJsp) {
 		try {
-			String sql = "UPDATE usuario SET login = ?, senha = ?, nome = ?, cep = ?, rua = ?, bairro = ?, cidade = ?, uf = ?, ibge = ?, fotobase64 = ?, contenttype = ? WHERE id = "
+			String sql = "UPDATE usuario SET login = ?, senha = ?, nome = ?, cep = ?, rua = ?, bairro = ?, cidade = ?, uf = ?, ibge = ?, fotobase64 = ?, contenttype = ?, curriculobase64 = ?, contenttypecurriculo = ?  WHERE id = "
 					+ beanCursoJsp.getId();
 
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -264,6 +280,8 @@ public class DaoUsuario {
 			preparedStatement.setString(9, beanCursoJsp.getIbge());
 			preparedStatement.setString(10, beanCursoJsp.getFoto());
 			preparedStatement.setString(11, beanCursoJsp.getContentType());
+			preparedStatement.setString(12, beanCursoJsp.getCurriculoBase64());
+			preparedStatement.setString(13, beanCursoJsp.getContentTypeCurriculo());
 
 			preparedStatement.executeUpdate();
 
