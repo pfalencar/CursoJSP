@@ -195,8 +195,8 @@ public class UsuarioServlet extends HttpServlet {
 						beanCursoJsp.setFoto(fotoBase64);
 						beanCursoJsp.setContentType(imagemFoto.getContentType());
 
-					} else { // se não tiver nada no campo de foto, pega o que tem nos parâmetros "fotoTemp"
-										// e "contentTypeFotoTemp" e coloca no objeto
+					} else { 
+	// se não tiver nada no campo de foto, pega o que tem nos parâmetros "fotoTemp" e "contentTypeFotoTemp" e coloca no objeto
 						beanCursoJsp.setFoto(request.getParameter("fotoTemp"));
 						beanCursoJsp.setContentType(request.getParameter("contentTypeFotoTemp"));
 					}
@@ -210,7 +210,9 @@ public class UsuarioServlet extends HttpServlet {
 
 						beanCursoJsp.setCurriculoBase64(curriculoBase64);
 						beanCursoJsp.setContentTypeCurriculo(arquivoCurriculo.getContentType());
+						
 					} else {
+	// se não tiver nada no campo de curriculo, pega o que tem nos parâmetros "curriculoTemp" e "curriculoContentType" e coloca no objeto
 						beanCursoJsp.setCurriculoBase64(request.getParameter("curriculoTemp"));
 						beanCursoJsp.setContentTypeCurriculo(request.getParameter("curriculoContentType"));
 					}

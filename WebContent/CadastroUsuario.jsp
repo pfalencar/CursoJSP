@@ -77,8 +77,8 @@
           <td>Foto: </td>
           <td>
             <input type="file" name="foto" />
-              <input type="text" name="fotoTemp" readonly="readonly" value="${user.foto}"/>
-              <input type="text" name="contentTypeFotoTemp" readonly="readonly" value="${user.contentType}"/>
+              <input type="text" class="hide" name="fotoTemp" readonly="readonly" value="${user.foto}"/>
+              <input type="text" class="hide" name="contentTypeFotoTemp" readonly="readonly" value="${user.contentType}"/>
           </td>
         </tr>
         
@@ -86,8 +86,8 @@
           <td>Currículo: </td>
           <td>
             <input type="file" name="curriculo"/>
-              <input type="text" name="curriculoTemp" readonly="readonly" value="${user.curriculoBase64}"/> 
-              <input type="text" name="curriculoContentType" readonly="readonly" value="${user.contentTypeCurriculo}"/> 
+              <input type="text" class="hide" name="curriculoTemp" readonly="readonly" value="${user.curriculoBase64}"/> 
+              <input type="text" class="hide" name="curriculoContentType" readonly="readonly" value="${user.contentTypeCurriculo}"/> 
           </td>
         </tr>
         
@@ -128,8 +128,20 @@
         <!-- "user.id" são os nomes do objeto! -->
         <td><c:out value="${user.id}"></c:out></td>
         <td><c:out value="${user.login}"></c:out></td>
-        <td><a href="salvarUsuario?acao=download&tipo=imagem&user=${user.id}" ><img src='<c:out value="${user.tempFotoUser}" />' alt="Imagem User" title="Imagem User" width="32px" height="32px"/></a></td>
-        <td><a href="salvarUsuario?acao=download&tipo=curriculo&user=${user.id}">Currículo</a></td>
+        
+        <c:if test="${user.foto.isBlank() == false && user.foto.isEmpty() == false}">
+          <td><a href="salvarUsuario?acao=download&tipo=imagem&user=${user.id}" ><img src='<c:out value="${user.tempFotoUser}" />' alt="Imagem User" title="Imagem User" width="32px" height="32px"/></a></td>
+        </c:if>
+        <c:if test="${user.foto.isBlank() == true || user.foto.isEmpty() == true}">
+          <td><img src="resources/img/user_icon_empty.png" title="Sem Imagem" width="32px" height="32px" onclick="alert('Não possui imagem!')"/></td>
+        </c:if>
+        
+        <c:if test="${user.curriculoBase64.isBlank() == false && user.curriculoBase64.isEmpty() == false}">        
+          <td><a href="salvarUsuario?acao=download&tipo=curriculo&user=${user.id}"><img src="resources/img/pdf_icon.PNG" alt="Curriculo" title="Curriculo" width="32px" height="32px" /></a></td>
+        </c:if>
+        <c:if test="${user.curriculoBase64.isBlank() == true || user.curriculoBase64.isEmpty() == true}">
+          <td><img src="resources/img/file_blank.png" title="Sem Curriculo" width="32px" height="32px" onclick="alert('Não possui currículo!')"/></td>
+        </c:if>
         <td><c:out value="${user.nome}"></c:out></td>
         <td><c:out value="${user.cep}"></c:out></td>
         <td><c:out value="${user.rua}"></c:out></td>

@@ -44,9 +44,11 @@
             
           <td>Tipo:</td>
           <td><select id="tipo" name="tipo">
-            <option>Casa</option>
-            <option>Contato</option>
             <option>Celular</option>
+            <option>Casa</option>
+            <option>Trabalho</option>
+            <option>Recado</option>
+            <option>Outros</option>
           </select></td>
         </tr>
 
@@ -66,11 +68,11 @@
       <h3>Telefones Cadastrados</h3>
     </caption>
     <tr>
-      <th>Id</th>
-      <th>Número</th>
-      <th>Tipo</th>
       <th>Id Usuário</th>
       <th>Usuário</th>
+      <th>Id Telefone</th>
+      <th>Número</th>
+      <th>Tipo</th>
       <th>Excluir</th>
     </tr>
     
@@ -81,11 +83,11 @@
       <tr>
         <!-- "user.id" são os nomes do objeto! -->
         <!-- "user" é a entidade, por isso ".estado", que é o atributo. -->
+        <td><c:out value="${userEscolhido.id}"></c:out></td>
+        <td><c:out value="${userEscolhido.nome}"></c:out></td>
         <td><c:out value="${fone.id}"></c:out></td>
         <td><c:out value="${fone.numero}"></c:out></td>
         <td><c:out value="${fone.tipo}"></c:out></td>
-        <td><c:out value="${userEscolhido.id}"></c:out></td>
-        <td><c:out value="${userEscolhido.nome}"></c:out></td>
 
         <td><a href="salvarTelefone?acao=delete&foneId=${fone.id}"><img
             src="resources/img/lixeira.png" alt="Excluir"

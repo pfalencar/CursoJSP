@@ -116,3 +116,6 @@ h1 {
   color: white;
 }
 
+.hide {
+	display: none;
+}

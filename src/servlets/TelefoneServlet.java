@@ -36,11 +36,11 @@ public class TelefoneServlet extends HttpServlet {
 				String user = request.getParameter("user");
 				BeanCursoJsp usuario = daoUsuario.consultar(user);
 
-				request.getSession().setAttribute("userEscolhido", usuario);
-				request.setAttribute("userEscolhido", usuario);
+				request.getSession().setAttribute("userEscolhido", usuario);//seta na sessão no atributo "userEscolhido"(usado dentro do jsp, não no html) todo o usuário
+				request.setAttribute("userEscolhido", usuario);//seta na tela(CadastroTelefone.jsp) no parametro "userEscolhido" todo o objeto usuário
 
 				RequestDispatcher view = request.getRequestDispatcher("CadastroTelefone.jsp");
-				request.setAttribute("telefone", daoTelefone.listar(usuario.getId()));
+				request.setAttribute("telefone", daoTelefone.listar(usuario.getId())); //pega a lista e seta no atributo jsp da tela CadastroTelefone.jsp
 				view.forward(request, response);
 
 				

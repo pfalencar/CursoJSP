@@ -18,27 +18,33 @@ public class LoginServlet extends HttpServlet {
 	private DaoLogin daoLogin = new DaoLogin();
 
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		try {
+
 			String login = request.getParameter("login");
 			String senha = request.getParameter("senha");
 
-			if (daoLogin.validarLogin(login, senha)) { // acesso ok
+			if (login != null && !login.isEmpty() && senha != null && !senha.isEmpty()) {
+
+				if (daoLogin.validarLogin(login, senha)) { // acesso ok
+
+					RequestDispatcher dispatcher = request.getRequestDispatcher("AcessoLiberado.jsp");
+					dispatcher.forward(request, response);
+
+				} else { // acesso negado
+
+					RequestDispatcher dispatcher = request.getRequestDispatcher("AcessoNegado.jsp");
+					dispatcher.forward(request, response);
+				}
 				
-				RequestDispatcher dispatcher = request.getRequestDispatcher("AcessoLiberado.jsp");
-				dispatcher.forward(request, response);
-				
-			} else { // acesso negado
-				
-				RequestDispatcher dispatcher = request.getRequestDispatcher("AcessoNegado.jsp");
+			} else {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
 				dispatcher.forward(request, response);
 			}
 			
