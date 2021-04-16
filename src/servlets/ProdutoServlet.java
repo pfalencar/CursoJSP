@@ -26,20 +26,20 @@ public class ProdutoServlet extends HttpServlet {
 			String acao = request.getParameter("acao");
 			String idProduto = request.getParameter("prod");
 
-			if (acao.equalsIgnoreCase("listarTodos")) {
+			if (acao != null && acao.equalsIgnoreCase("listarTodos")) {
 				RequestDispatcher view = request.getRequestDispatcher("CadastroProduto.jsp");
 				request.setAttribute("produto", daoProduto.listar());
 				view.forward(request, response);
 
-			} else if (acao.equalsIgnoreCase("delete")) {
+			} else if (acao != null && acao.equalsIgnoreCase("delete")) {
 				daoProduto.deletar(idProduto);
 				request.setAttribute("msg", "Deletado com sucesso!");
-				
+
 				RequestDispatcher view = request.getRequestDispatcher("CadastroProduto.jsp");
 				request.setAttribute("produto", daoProduto.listar());
 				view.forward(request, response);
 
-			} else if (acao.equalsIgnoreCase("editar")) {
+			} else if (acao != null && acao.equalsIgnoreCase("editar")) {
 
 				Produto produto = daoProduto.consultar(idProduto);
 
@@ -47,6 +47,11 @@ public class ProdutoServlet extends HttpServlet {
 				request.setAttribute("prod", produto);
 				view.forward(request, response);
 
+			} else {
+
+				RequestDispatcher view = request.getRequestDispatcher("CadastroProduto.jsp");
+				request.setAttribute("produto", daoProduto.listar());
+				view.forward(request, response);
 			}
 
 		} catch (Exception e) {
@@ -61,8 +66,8 @@ public class ProdutoServlet extends HttpServlet {
 
 		String acao = request.getParameter("acao");
 
-		if (acao.equalsIgnoreCase("reset")) {
-			
+		if (acao != null && acao.equalsIgnoreCase("reset")) {
+
 			try {
 				RequestDispatcher view = request.getRequestDispatcher("CadastroProduto.jsp");
 				request.setAttribute("produto", daoProduto.listar());
@@ -70,8 +75,8 @@ public class ProdutoServlet extends HttpServlet {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-		} else if (acao.equalsIgnoreCase("salvar")) {
+
+		} else if (acao != null && acao.equalsIgnoreCase("salvar")) {
 
 			String id = request.getParameter("id");
 			String nome = request.getParameter("nome");
@@ -79,25 +84,28 @@ public class ProdutoServlet extends HttpServlet {
 			String valor = request.getParameter("valor");
 
 			Produto produto = new Produto();
-			
-			produto.setId(id != null && !id.isEmpty() ? Long.valueOf(id) : null);
-			produto.setNome(nome != null && !nome.isEmpty() ? nome : null);
-			produto.setQuantidade(quantidade != null && !quantidade.isEmpty() ? Double.parseDouble(quantidade) : 0.00);
-			produto.setValor(valor != null && !valor.isEmpty() ? Double.parseDouble(valor) : 0.00);
+
+			produto.setId((id == null || (id != null && id.isEmpty())) ? null : Long.valueOf(id));
+			produto.setNome((nome == null || (nome != null && nome.isEmpty())) ? null : nome);
+			produto.setQuantidade(
+					quantidade == null || (quantidade != null && quantidade.isEmpty()) ? 0 : Integer.parseInt(quantidade));
+
+			double valorDouble = Double.parseDouble(virgulaParaPonto(valor));
+			produto.setValor((valor == null || (valor != null && valor.isEmpty())) ? 0.00 : valorDouble);
 
 			try {
-				if ( nome == null || nome.isEmpty() ) {
+				if (nome == null || (nome != null && nome.isEmpty())) {
 					request.setAttribute("msg", "Nome é obrigatório!");
 					request.setAttribute("prod", produto);
-					
-				} else if ( quantidade == null || quantidade.isEmpty() || produto.getQuantidade() == 0.00 ) {
+
+				} else if (quantidade == null || quantidade.isEmpty() || produto.getQuantidade() == 0.00) {
 					request.setAttribute("msg", "Quantidade é obrigatória!");
 					request.setAttribute("prod", produto);
-					
-				} else if ( valor == null || valor.isBlank() || produto.getValor() == 0.00 ) {
+
+				} else if (valor == null || valor.isBlank() || produto.getValor() == 0.00) {
 					request.setAttribute("msg", "Valor é obrigatório!");
 					request.setAttribute("prod", produto);
-					
+
 				} else if (id == null || id.isEmpty()) {
 					if (!daoProduto.isNomeProdutoDuplicado(nome)) {
 						daoProduto.salvar(produto);
@@ -106,9 +114,9 @@ public class ProdutoServlet extends HttpServlet {
 						request.setAttribute("msg", "Já existe um produto cadastrado com este nome.");
 						request.setAttribute("prod", produto);
 					}
-					
+
 				} else if (id != null || !id.isEmpty()) {
-					if ( !daoProduto.isNomeProdutoDuplicadoAtualizar(nome, id) ) {
+					if (!daoProduto.isNomeProdutoDuplicadoAtualizar(nome, id)) {
 						daoProduto.atualizar(produto);
 						request.setAttribute("msg", "Atualizado com sucesso!");
 					} else {
@@ -116,7 +124,7 @@ public class ProdutoServlet extends HttpServlet {
 						request.setAttribute("prod", produto);
 					}
 				}
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -129,7 +137,22 @@ public class ProdutoServlet extends HttpServlet {
 				e.printStackTrace();
 			}
 		} // acao=salvar
+		else {
+			try {
+				RequestDispatcher view = request.getRequestDispatcher("CadastroProduto.jsp");
+				request.setAttribute("produto", daoProduto.listar());
+				view.forward(request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
+	}
+
+	private static String virgulaParaPonto(String valor) {
+		String valor2 = valor.replace(".", "");// 3.953,37
+		String valor3 = valor2.replace(",", ".");// 3953,37
+		return valor3;
 	}
 
 }

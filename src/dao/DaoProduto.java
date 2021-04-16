@@ -32,7 +32,7 @@ public class DaoProduto {
 			
 			produto.setId( Long.valueOf(rs.getInt("id")) );
 			produto.setNome(rs.getString("nome"));
-			produto.setQuantidade( rs.getDouble("quantidade") );
+			produto.setQuantidade( rs.getInt("quantidade") );
 			produto.setValor( rs.getDouble("valor") );
 			
 			listaProdutos.add(produto);
@@ -74,7 +74,7 @@ public class DaoProduto {
 			
 			produto.setId( Long.valueOf(resultSet.getInt("id")) );
 			produto.setNome( resultSet.getString("nome") );
-			produto.setQuantidade( resultSet.getDouble("quantidade") );
+			produto.setQuantidade( resultSet.getInt("quantidade") );
 			produto.setValor( resultSet.getDouble("valor") );
 			
 			return produto;
@@ -90,7 +90,7 @@ public class DaoProduto {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 			
 			preparedStatement.setString( 1, produto.getNome() );
-			preparedStatement.setDouble( 2, produto.getQuantidade() );
+			preparedStatement.setInt( 2, produto.getQuantidade() );
 			preparedStatement.setDouble( 3, produto.getValor() );
 			
 			preparedStatement.execute();

@@ -27,6 +27,7 @@ public class UsuarioServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private DaoUsuario daoUsuario = new DaoUsuario();
+	private String mensagem = "";
 
 	public UsuarioServlet() {
 		super();
@@ -40,37 +41,22 @@ public class UsuarioServlet extends HttpServlet {
 			String user = request.getParameter("user"); // O "user" recebe o id do usuário. Só para deletar e editar, pois têm
 																									// id.
 
-			if (acao.equalsIgnoreCase("delete")) {
-
+			if (acao != null && acao.equalsIgnoreCase("delete")) {
 				daoUsuario.deletar(user);
-				request.setAttribute("msg", "Deletado com sucesso!");
+				mensagem = "Deletado com sucesso!";				
+				retornarParaCadastroUsuario(mensagem, request, response);// depois que deletou eu carrego os usuários e volto para a mesma página
 
-				// depois que deletou eu carrego os usuários e volto para a mesma página
-				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-				// "usuario" é a tabela da página, onde serão listados os usuários que estão no
-				// BD
-				request.setAttribute("usuario", daoUsuario.listar());
-				view.forward(request, response);
-
-			} else if (acao.equalsIgnoreCase("editar")) {
-
+			} else if (acao != null && acao.equalsIgnoreCase("editar")) {
 				BeanCursoJsp beanCursoJsp = daoUsuario.consultar(user);
+				setarCamposNoFormulario(beanCursoJsp, request, response);
 
-				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-				// "user" é 1 usuário que está nos campos da tela.
-				request.setAttribute("user", beanCursoJsp);
-				view.forward(request, response);
+			} else if (acao != null && acao.equalsIgnoreCase("listarTodos")) {
+				retornarParaCadastroUsuario(request, response);
 
-			} else if (acao.equalsIgnoreCase("listarTodos")) {
-
-				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-				request.setAttribute("usuario", daoUsuario.listar());
-				view.forward(request, response);
-
-			} else if (acao.equalsIgnoreCase("download")) {
+			} else if (acao != null && acao.equalsIgnoreCase("download")) {
 				BeanCursoJsp beanCursoJsp = daoUsuario.consultar(user);
+				
 				if (beanCursoJsp != null) {
-
 					String conteudoTipo = "";
 					String arquivoBase64Objeto = null;
 					byte[] arquivoEmBytes = null;
@@ -79,8 +65,7 @@ public class UsuarioServlet extends HttpServlet {
 
 					if (tipo.equalsIgnoreCase("imagem")) {
 						conteudoTipo = beanCursoJsp.getContentType();
-						arquivoBase64Objeto = beanCursoJsp.getFoto();
-						
+						arquivoBase64Objeto = beanCursoJsp.getFoto();						
 
 					} else if (tipo.equalsIgnoreCase("curriculo")) {
 						conteudoTipo = beanCursoJsp.getContentTypeCurriculo();
@@ -94,10 +79,8 @@ public class UsuarioServlet extends HttpServlet {
 					// vou fazer o movimento de download sem abrir uma nova tela. Vai baixar como arquivo.extensão
 					
 					if ( conteudoTipo == null || conteudoTipo == "" || conteudoTipo.isEmpty() || conteudoTipo.isBlank() || arquivoBase64Objeto == null || arquivoBase64Objeto == "" || arquivoBase64Objeto.isEmpty() || arquivoBase64Objeto.isBlank()) {
-						RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-						request.setAttribute("msg", "Não há arquivo para download!");
-						request.setAttribute("usuario", daoUsuario.listar());
-						view.forward(request, response);
+						mensagem = "Não há arquivo para download!";
+						retornarParaCadastroUsuario(mensagem, request, response);
 
 					} else {
 						arquivoEmBytes = new Base64().decodeBase64(arquivoBase64Objeto); // tem que colocar a foto num array de bytes. Converte a base64 da imagem do banco para byte[]
@@ -122,6 +105,8 @@ public class UsuarioServlet extends HttpServlet {
 					}
 				}
 
+			} else {
+				retornarParaCadastroUsuario(request, response);
 			}
 
 		} catch (Exception e) {
@@ -136,10 +121,10 @@ public class UsuarioServlet extends HttpServlet {
 		String acao = request.getParameter("acao");
 
 		if (acao != null && acao.equalsIgnoreCase("reset")) {
+			
 			try {
-				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-				request.setAttribute("usuario", daoUsuario.listar());
-				view.forward(request, response);
+				retornarParaCadastroUsuario(request, response);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -284,11 +269,8 @@ public class UsuarioServlet extends HttpServlet {
 
 			// para ficar na mesma página após cadastrar novo usuário
 			try {
-				RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-				request.setAttribute("usuario", daoUsuario.listar()); // "usuario" é a variável jsp do foreach no
-																															// CadastroUsuario.jsp: (<c:forEach items="${usuario}"
-																															// var="user">)
-				view.forward(request, response);
+				retornarParaCadastroUsuario(request, response);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -296,16 +278,39 @@ public class UsuarioServlet extends HttpServlet {
 		}
 
 	}
+	
+	private void setarCamposNoFormulario (BeanCursoJsp beanCursoJsp, HttpServletRequest request, HttpServletResponse response) throws Exception, IOException {
+		RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
+		// "user" é 1 usuário que está nos campos da tela.
+		request.setAttribute("user", beanCursoJsp);
+		view.forward(request, response);
+	}
+	
+	private void retornarParaCadastroUsuario(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
+		request.setAttribute("usuario", daoUsuario.listar());// "usuario" é a tabela da página, onde serão listados os usuários que estão no BD
+		view.forward(request, response);
+	}
+	
+	private void retornarParaCadastroUsuario(String mensagem, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
+	// "usuario" é a variável jsp do foreach no CadastroUsuario.jsp: (<c:forEach items="${usuario}" var="user">)
+		request.setAttribute("usuario", daoUsuario.listar());
+		request.setAttribute("msg", mensagem);
+		view.forward(request, response);
+	}
 
 	// Converte a entrada de fluxo de dados da imagem para um array de bytes
 	private static byte[] converterStreamToByte(InputStream imagem) throws IOException {
+		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
 		int reads = imagem.read();
+		
 		while (reads != -1) {
 			baos.write(reads);
 			reads = imagem.read();
 		}
+		
 		return baos.toByteArray();
 	}
 

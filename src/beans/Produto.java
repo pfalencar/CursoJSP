@@ -4,7 +4,7 @@ public class Produto {
 	
 	private Long id;
 	private String nome;
-	private double quantidade;
+	private int quantidade;
 	private double valor;
 	
 	public Long getId() {
@@ -19,10 +19,10 @@ public class Produto {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	public double getQuantidade() {
+	public int getQuantidade() {
 		return quantidade;
 	}
-	public void setQuantidade(double quantidade) {
+	public void setQuantidade(int quantidade) {
 		this.quantidade = quantidade;
 	}
 	public double getValor() {
@@ -32,5 +32,8 @@ public class Produto {
 		this.valor = valor;
 	}
 	
-
+	public String getValorEmTexto() {
+		return Double.toString(valor).replace('.',',');
+	}
+	
 }
