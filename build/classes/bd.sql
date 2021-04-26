@@ -16,9 +16,7 @@ CREATE DATABASE "curso-jsp"
 	ALTER TABLE public.usuario_id_seq
 	  OWNER TO postgres;
 	  
-	  
-	CREATE TABLE public.usuario
-	(
+	CREATE TABLE public.usuario (
 	  id integer NOT NULL DEFAULT nextval('usuario_id_seq'::regclass),
 	  login character varying(255) NOT NULL,
 	  senha character varying(255) NOT NULL,
@@ -31,12 +29,14 @@ CREATE DATABASE "curso-jsp"
 	  ibge character varying(200),
 	  fotobase64 text,
 	  contenttype text,
+	  curriculobase64 text,
+	  contenttypecurriculo text,
+	  fotominiatura text,
 	  CONSTRAINT usuario_id PRIMARY KEY (id)
 	)
-	WITH (
-	  OIDS=FALSE
-	);
+	WITH (OIDS=FALSE);
 	ALTER TABLE public.usuario OWNER TO postgres;
+
 
 	  
 	CREATE SEQUENCE public.produto_id_seq

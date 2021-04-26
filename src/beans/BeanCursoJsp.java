@@ -12,24 +12,13 @@ public class BeanCursoJsp {
 	private String cidade;
 	private String estado;
 	private String ibge;
-	private String foto;
-	private String contentType;
-	private String tempFotoUser;
+	private String foto;	
+	private String contentType;	
+	private String tempFotoUser;	
+	private String miniaturaFoto;
 	private String curriculoBase64;
 	private String contentTypeCurriculo;
-	private String tempCurriculoUser;
-	
-	public String getTempCurriculoUser() {
-		tempCurriculoUser = "data:" + this.contentTypeCurriculo + ";base64," + this.curriculoBase64;
-		return tempCurriculoUser;
-	}
-	
-	
-	public String getTempFotoUser() {
-		tempFotoUser = "data:" + this.contentType + ";base64," + this.foto;
-		return tempFotoUser;
-	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -102,6 +91,20 @@ public class BeanCursoJsp {
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
 	}	
+	
+	public String getTempFotoUser() {
+		tempFotoUser = "data:" + this.contentType + ";base64," + this.foto;
+		return tempFotoUser;
+	}		
+	
+	public void setMiniaturaFoto(String miniaturaFoto) {
+		this.miniaturaFoto = miniaturaFoto;
+	}	
+	public String getMiniaturaFoto() {
+		return miniaturaFoto;
+	}
+	
+	
 	public String getCurriculoBase64() {
 		return curriculoBase64;
 	}

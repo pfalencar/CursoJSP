@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 import beans.BeanCursoJsp;
 import connection.SingleConnection;
 
@@ -21,88 +19,25 @@ public class DaoUsuario {
 	}
 
 	public void salvar(BeanCursoJsp beanCursoJsp) {
-		String sql = "INSERT INTO usuario (login, senha, nome, cep, rua, bairro, cidade, uf, ibge, fotobase64, contenttype, curriculobase64, contenttypecurriculo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO usuario (login, senha, nome, cep, rua, bairro, cidade, uf, ibge, fotobase64, contenttype, curriculobase64, contenttypecurriculo, fotominiatura) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
-			if (beanCursoJsp.getLogin() != null) {
-				preparedStatement.setString(1, beanCursoJsp.getLogin());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira um login válido.");
-			}
-
-			if (beanCursoJsp.getSenha() != null) {
-				preparedStatement.setString(2, beanCursoJsp.getSenha());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira uma senha válida.");
-			}
-
-			if (beanCursoJsp.getNome() != null) {
-				preparedStatement.setString(3, beanCursoJsp.getNome());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira um nome válido.");
-			}
-
-			if (beanCursoJsp.getCep() != null) {
-				preparedStatement.setString(4, beanCursoJsp.getCep());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira um cep válido.");
-			}
-
-			if (beanCursoJsp.getRua() != null) {
-				preparedStatement.setString(5, beanCursoJsp.getRua());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira uma rua válida.");
-			}
-
-			if (beanCursoJsp.getBairro() != null) {
-				preparedStatement.setString(6, beanCursoJsp.getBairro());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira um bairro válido.");
-			}
-
-			if (beanCursoJsp.getCidade() != null) {
-				preparedStatement.setString(7, beanCursoJsp.getCidade());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira uma cidade válida.");
-			}
-
-			if (beanCursoJsp.getEstado() != null) {
-				preparedStatement.setString(8, beanCursoJsp.getEstado());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira um estado válido.");
-			}
-
-			if (beanCursoJsp.getIbge() != null) {
-				preparedStatement.setString(9, beanCursoJsp.getIbge());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira um IBGE válido.");
-			}
-			
-			if (beanCursoJsp.getFoto() != null) {
-				preparedStatement.setString(10, beanCursoJsp.getFoto());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira a foto.");
-			}
-			
-			if (beanCursoJsp.getContentType() != null) {
-				preparedStatement.setString(11, beanCursoJsp.getContentType());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira o tipo de dado da foto.");
-			}
-			
-			if (beanCursoJsp.getContentType() != null) {
-				preparedStatement.setString(12, beanCursoJsp.getCurriculoBase64());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira o currículo.");
-			}
-			
-			if (beanCursoJsp.getContentType() != null) {
-				preparedStatement.setString(13, beanCursoJsp.getContentTypeCurriculo());
-			} else {
-				JOptionPane.showMessageDialog(null, "Insira o tipo de dado do currículo.");
-			}
+			preparedStatement.setString(1, beanCursoJsp.getLogin());
+			preparedStatement.setString(2, beanCursoJsp.getSenha());
+			preparedStatement.setString(3, beanCursoJsp.getNome());
+			preparedStatement.setString(4, beanCursoJsp.getCep());
+			preparedStatement.setString(5, beanCursoJsp.getRua());
+			preparedStatement.setString(6, beanCursoJsp.getBairro());
+			preparedStatement.setString(7, beanCursoJsp.getCidade());
+			preparedStatement.setString(8, beanCursoJsp.getEstado());
+			preparedStatement.setString(9, beanCursoJsp.getIbge());
+			preparedStatement.setString(10, beanCursoJsp.getFoto());
+			preparedStatement.setString(11, beanCursoJsp.getContentType());
+			preparedStatement.setString(12, beanCursoJsp.getCurriculoBase64());
+			preparedStatement.setString(13, beanCursoJsp.getContentTypeCurriculo());
+			preparedStatement.setString(14, beanCursoJsp.getMiniaturaFoto());
 
 			preparedStatement.execute();
 			connection.commit();
@@ -139,11 +74,12 @@ public class DaoUsuario {
 			beanCursoJsp.setCidade(resultSet.getString("cidade"));
 			beanCursoJsp.setEstado(resultSet.getString("uf"));
 			beanCursoJsp.setIbge(resultSet.getString("ibge"));
-			beanCursoJsp.setFoto(resultSet.getString("fotobase64"));
+//			beanCursoJsp.setFoto(resultSet.getString("fotobase64"));
 			beanCursoJsp.setContentType(resultSet.getString("contenttype"));
 			beanCursoJsp.setCurriculoBase64(resultSet.getString("curriculobase64"));
 			beanCursoJsp.setContentTypeCurriculo(resultSet.getString("contenttypecurriculo"));
-			
+			beanCursoJsp.setMiniaturaFoto(resultSet.getString("fotominiatura"));
+
 			lista.add(beanCursoJsp);
 		}
 		return lista;
@@ -196,7 +132,8 @@ public class DaoUsuario {
 				beanCursoJsp.setContentType(resultSet.getString("contenttype"));
 				beanCursoJsp.setCurriculoBase64(resultSet.getString("curriculobase64"));
 				beanCursoJsp.setContentTypeCurriculo(resultSet.getString("contenttypecurriculo"));
-				
+				beanCursoJsp.setMiniaturaFoto(resultSet.getString("fotominiatura"));
+
 				return beanCursoJsp;
 			}
 		} catch (Exception e) {
@@ -206,6 +143,7 @@ public class DaoUsuario {
 
 	}
 
+	/*Responsável por validar se há 2 logins iguais (não pode existir 1 mesmo login para 2 usuários diferentes)*/
 	public boolean isLoginDuplicado(String login) throws Exception {
 		String sql = "SELECT count(1) AS qtd FROM usuario WHERE login = '" + login + "'";
 
@@ -214,9 +152,9 @@ public class DaoUsuario {
 
 		if (resultSet.next()) {
 			int res = resultSet.getInt("qtd");
-			return res != 0; // retorna true
+			return res != 0; // se esse retorno for != 0, então é true, e já tem um usuário com esse login no BD.
 		} else {
-			return false;
+			return false; // quando o resultado é igual a zero, ou seja, não tem nenhum usuário com esse login no BD.
 		}
 	}
 
@@ -242,9 +180,9 @@ public class DaoUsuario {
 
 		if (resultSet.next()) {
 			int res = resultSet.getInt("qtd");
-			return res > 0; // retorna true
+			return res != 0; // retorna true: já tem um id no BD com esse login. Tem esse login para um id diferente do que estou pesquisando.
 		} else {
-			return false;
+			return false; //se res=0, então não tem esse login para um id diferente do que estou pesquisando.
 		}
 	}
 
@@ -264,8 +202,17 @@ public class DaoUsuario {
 
 	public void atualizar(BeanCursoJsp beanCursoJsp) {
 		try {
-			String sql = "UPDATE usuario SET login = ?, senha = ?, nome = ?, cep = ?, rua = ?, bairro = ?, cidade = ?, uf = ?, ibge = ?, fotobase64 = ?, contenttype = ?, curriculobase64 = ?, contenttypecurriculo = ?  WHERE id = "
-					+ beanCursoJsp.getId();
+			StringBuilder sqlBuilder = new StringBuilder("UPDATE usuario SET login = ?, senha = ?, nome = ?, cep = ?, rua = ?,"
+					+ " bairro = ?, cidade = ?, uf = ?, ibge = ?, fotobase64 = ?, contenttype = ?, curriculobase64 = ?, "
+					+ "contenttypecurriculo = ?");
+			
+			boolean isMiniaturaFoto = beanCursoJsp.getMiniaturaFoto() != null && !beanCursoJsp.getMiniaturaFoto().isEmpty();			
+			if (isMiniaturaFoto) { 
+				sqlBuilder.append(", fotominiatura = ?"); 
+			}
+			
+			sqlBuilder.append("  WHERE id = ").append(beanCursoJsp.getId());
+			String sql = sqlBuilder.toString();
 
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
@@ -282,7 +229,9 @@ public class DaoUsuario {
 			preparedStatement.setString(11, beanCursoJsp.getContentType());
 			preparedStatement.setString(12, beanCursoJsp.getCurriculoBase64());
 			preparedStatement.setString(13, beanCursoJsp.getContentTypeCurriculo());
-
+			if (isMiniaturaFoto) { 
+				preparedStatement.setString(14, beanCursoJsp.getMiniaturaFoto());
+			}
 			preparedStatement.executeUpdate();
 
 			connection.commit();

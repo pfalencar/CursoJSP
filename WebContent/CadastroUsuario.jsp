@@ -121,21 +121,21 @@
         <td><c:out value="${user.id}"></c:out></td>        
         <td><c:out value="${user.login}"></c:out></td>
         
-        <c:if test="${user.foto.isBlank() == false && user.foto.isEmpty() == false}">
+        <c:if test="${user.miniaturaFoto.isEmpty() == false}">
           <td>
             <a href="salvarUsuario?acao=download&tipo=imagem&user=${user.id}">
-              <img src='<c:out value="${user.tempFotoUser}" />' alt="Imagem User" title="Imagem User" width="32px" height="32px"/>
+              <img src='<c:out value="${user.miniaturaFoto}" />' alt="Imagem User" title="Imagem User" name="minifoto" width="32px" height="32px"/>
             </a>
           </td>
         </c:if>
         
-        <c:if test="${user.foto.isBlank() == true || user.foto.isEmpty() == true}">
+        <c:if test="${user.miniaturaFoto.isEmpty() == true}">
           <td>
             <img src="resources/img/user_icon_empty.png" title="Sem Imagem" width="32px" height="32px" onclick="alert('Não possui imagem!')"/>
           </td>
         </c:if>
         
-        <c:if test="${user.curriculoBase64.isBlank() == false && user.curriculoBase64.isEmpty() == false}">        
+        <c:if test="${user.curriculoBase64.isEmpty() == false}">        
           <td>
             <a href="salvarUsuario?acao=download&tipo=curriculo&user=${user.id}">
               <img src="resources/img/pdf_icon.PNG" alt="Curriculo" title="Curriculo" width="32px" height="32px" />
@@ -143,7 +143,7 @@
           </td>
         </c:if>
         
-        <c:if test="${user.curriculoBase64.isBlank() == true || user.curriculoBase64.isEmpty() == true}">
+        <c:if test="${user.curriculoBase64.isEmpty() == true}">
           <td>
             <img src="resources/img/file_blank.png" title="Sem Curriculo" width="32px" height="32px" onclick="alert('Não possui currículo!')"/>
           </td>

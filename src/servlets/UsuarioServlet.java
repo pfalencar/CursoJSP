@@ -1,10 +1,13 @@
 package servlets;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.imageio.ImageIO;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -13,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -41,10 +45,11 @@ public class UsuarioServlet extends HttpServlet {
 			String user = request.getParameter("user"); // O "user" recebe o id do usuário. Só para deletar e editar, pois têm
 																									// id.
 
-			if (acao != null && acao.equalsIgnoreCase("delete")) {
+			if (acao != null && acao.equalsIgnoreCase("delete") && user != null) {
 				daoUsuario.deletar(user);
-				mensagem = "Deletado com sucesso!";				
-				retornarParaCadastroUsuario(mensagem, request, response);// depois que deletou eu carrego os usuários e volto para a mesma página
+				mensagem = "Deletado com sucesso!";
+				retornarParaCadastroUsuario(mensagem, request, response);// depois que deletou eu carrego os usuários e volto
+																																	// para a mesma página
 
 			} else if (acao != null && acao.equalsIgnoreCase("editar")) {
 				BeanCursoJsp beanCursoJsp = daoUsuario.consultar(user);
@@ -55,54 +60,42 @@ public class UsuarioServlet extends HttpServlet {
 
 			} else if (acao != null && acao.equalsIgnoreCase("download")) {
 				BeanCursoJsp beanCursoJsp = daoUsuario.consultar(user);
-				
+
 				if (beanCursoJsp != null) {
 					String conteudoTipo = "";
-					String arquivoBase64Objeto = null;
-					byte[] arquivoEmBytes = null;
-					InputStream arquivoEmInputStream = null;
+					byte[] fileBytes = null;
+//					InputStream arquivoEmInputStream = null;
+
 					String tipo = request.getParameter("tipo");
 
 					if (tipo.equalsIgnoreCase("imagem")) {
 						conteudoTipo = beanCursoJsp.getContentType();
-						arquivoBase64Objeto = beanCursoJsp.getFoto();						
+						fileBytes = new Base64().decodeBase64(beanCursoJsp.getFoto());
 
 					} else if (tipo.equalsIgnoreCase("curriculo")) {
 						conteudoTipo = beanCursoJsp.getContentTypeCurriculo();
-						arquivoBase64Objeto = beanCursoJsp.getCurriculoBase64();
-						
+						fileBytes = new Base64().decodeBase64(beanCursoJsp.getCurriculoBase64());
 					}
 
-					// usando regex para pegar a extensão que está depois da "/" no contentType. O
-					// split coloca em um array. Escolho a segunda posição: [1] para pegar o que vem
-					// depois da "/"
-					// vou fazer o movimento de download sem abrir uma nova tela. Vai baixar como arquivo.extensão
-					
-					if ( conteudoTipo == null || conteudoTipo == "" || conteudoTipo.isEmpty() || conteudoTipo.isBlank() || arquivoBase64Objeto == null || arquivoBase64Objeto == "" || arquivoBase64Objeto.isEmpty() || arquivoBase64Objeto.isBlank()) {
-						mensagem = "Não há arquivo para download!";
-						retornarParaCadastroUsuario(mensagem, request, response);
+					response.setHeader("Content-Disposition", "attachment;filename=arquivo." + conteudoTipo.split("\\/")[1]);
 
-					} else {
-						arquivoEmBytes = new Base64().decodeBase64(arquivoBase64Objeto); // tem que colocar a foto num array de bytes. Converte a base64 da imagem do banco para byte[]
-						response.setHeader("Content-Disposition", "attachment;filename=arquivo." + conteudoTipo.split("\\/")[1]);
+					// colocar os bytes em um objeto de entrada (um fluxo de entrada) p processar. O
+					// InputStream é usado para receber os bytes.
+					InputStream is = new ByteArrayInputStream(fileBytes);
 
-						// colocar os bytes em um objeto de entrada (um fluxo de entrada) p processar. O InputStream é usado para receber os bytes.
-						arquivoEmInputStream = new ByteArrayInputStream(arquivoEmBytes);
+					// escrever na resposta
+					/* INÍCIO DA RESPOSTA PARA O NAVEGADOR */
+					int read = 0;
+					byte[] bytes = new byte[1024];
+					OutputStream os = response.getOutputStream();
 
-						// escrever na resposta
-						/* INÍCIO DA RESPOSTA PARA O NAVEGADOR */
-						int read = 0;
-						byte[] bytes = new byte[1024];
-						OutputStream outputStream = response.getOutputStream();
-
-						// enquanto a minha variável de controle "read" estiver lendo os bytes, é porque
-						// têm dados nele, ou seja é != -1
-						while ((read = arquivoEmInputStream.read(bytes)) != -1) {
-							outputStream.write(bytes, 0, read);
-						}
-						outputStream.flush();
-						outputStream.close();
+					// enquanto a minha variável de controle "read" estiver lendo os bytes, é porque
+					// têm dados nele, ou seja é != -1
+					while ((read = is.read(bytes)) != -1) {
+						os.write(bytes, 0, read);
 					}
+					os.flush();
+					os.close();
 				}
 
 			} else {
@@ -121,16 +114,12 @@ public class UsuarioServlet extends HttpServlet {
 		String acao = request.getParameter("acao");
 
 		if (acao != null && acao.equalsIgnoreCase("reset")) {
-			
 			try {
 				retornarParaCadastroUsuario(request, response);
-				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 		} else {
-
 			String id = request.getParameter("id");
 			String login = request.getParameter("login");
 			String senha = request.getParameter("senha");
@@ -145,16 +134,16 @@ public class UsuarioServlet extends HttpServlet {
 			BeanCursoJsp beanCursoJsp = new BeanCursoJsp();
 
 			try {
-				beanCursoJsp.setId(!id.isEmpty() && !id.isBlank() && id != null ? Long.parseLong(id) : null);
-				beanCursoJsp.setLogin(!login.isEmpty() || !login.isBlank() ? login : null);
-				beanCursoJsp.setSenha(!senha.isEmpty() || !senha.isBlank() ? senha : null);
-				beanCursoJsp.setNome(!nome.isEmpty() || !nome.isBlank() ? nome : null);
-				beanCursoJsp.setCep(!cep.isEmpty() || !cep.isBlank() ? cep : null);
-				beanCursoJsp.setRua(!rua.isEmpty() || !rua.isBlank() ? rua : null);
-				beanCursoJsp.setBairro(!bairro.isEmpty() || !bairro.isBlank() ? bairro : null);
-				beanCursoJsp.setCidade(!cidade.isEmpty() || !cidade.isBlank() ? cidade : null);
-				beanCursoJsp.setEstado(!estado.isEmpty() || !estado.isBlank() ? estado : null);
-				beanCursoJsp.setIbge(!ibge.isEmpty() || !ibge.isBlank() ? ibge : null);
+				beanCursoJsp.setId(id != null && !id.isEmpty() && !id.isBlank() ? Long.parseLong(id) : null);
+				beanCursoJsp.setLogin(login != null && !login.isEmpty() && !login.isBlank() ? login : null);
+				beanCursoJsp.setSenha(senha != null && !senha.isEmpty() && !senha.isBlank() ? senha : null);
+				beanCursoJsp.setNome(nome != null && !nome.isEmpty() && !nome.isBlank() ? nome : null);
+				beanCursoJsp.setCep(cep != null && !cep.isEmpty() && !cep.isBlank() ? cep : null);
+				beanCursoJsp.setRua(rua != null && !rua.isEmpty() && !rua.isBlank() ? rua : null);
+				beanCursoJsp.setBairro(bairro != null && !bairro.isEmpty() && !bairro.isBlank() ? bairro : null);
+				beanCursoJsp.setCidade(cidade != null && !cidade.isEmpty() && !cidade.isBlank() ? cidade : null);
+				beanCursoJsp.setEstado(estado != null && !estado.isEmpty() && !estado.isBlank() ? estado : null);
+				beanCursoJsp.setIbge(ibge != null && !ibge.isEmpty() && !ibge.isBlank() ? ibge : null);
 
 			} catch (Exception f) {
 				f.printStackTrace();
@@ -180,8 +169,36 @@ public class UsuarioServlet extends HttpServlet {
 						beanCursoJsp.setFoto(fotoBase64);
 						beanCursoJsp.setContentType(imagemFoto.getContentType());
 
-					} else { 
-	// se não tiver nada no campo de foto, pega o que tem nos parâmetros "fotoTemp" e "contentTypeFotoTemp" e coloca no objeto
+						/* INÍCIO MINIATURA IMAGEM */
+
+						/* Transforma em um bufferedImage */
+						byte[] imageByteDecode = new Base64().decodeBase64(fotoBase64);
+						BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageByteDecode));
+
+						/* Pega o tipo da imagem */
+						int typeImage = bufferedImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : bufferedImage.getType();
+
+						/* Cria imagem em miniatura */
+						BufferedImage resizedImage = new BufferedImage(100, 100, typeImage);
+						Graphics2D g = resizedImage.createGraphics();
+						g.drawImage(bufferedImage, 0, 0, 100, 100, null); /* Transforma a miniatura em uma imagem novamente */
+						g.dispose();
+
+						/* A imagem está em fluxo de dados, preciso escrever ela novamente: */
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						ImageIO.write(resizedImage, "png", baos);
+
+						String miniaturaBase64 = "data:image/png;base64," + DatatypeConverter.printBase64Binary(baos.toByteArray());
+
+//						System.out.println("miniaturaBase64: " + miniaturaBase64);
+
+						beanCursoJsp.setMiniaturaFoto(miniaturaBase64);
+
+						/* FIM MINIATURA IMAGEM */
+
+					} else {
+						// se não tiver nada no campo de foto, pega o que tem nos parâmetros "fotoTemp"
+						// e "contentTypeFotoTemp" e coloca no objeto
 						beanCursoJsp.setFoto(request.getParameter("fotoTemp"));
 						beanCursoJsp.setContentType(request.getParameter("contentTypeFotoTemp"));
 					}
@@ -195,9 +212,10 @@ public class UsuarioServlet extends HttpServlet {
 
 						beanCursoJsp.setCurriculoBase64(curriculoBase64);
 						beanCursoJsp.setContentTypeCurriculo(arquivoCurriculo.getContentType());
-						
+
 					} else {
-	// se não tiver nada no campo de curriculo, pega o que tem nos parâmetros "curriculoTemp" e "curriculoContentType" e coloca no objeto
+						// se não tiver nada no campo de curriculo, pega o que tem nos parâmetros
+						// "curriculoTemp" e "curriculoContentType" e coloca no objeto
 						beanCursoJsp.setCurriculoBase64(request.getParameter("curriculoTemp"));
 						beanCursoJsp.setContentTypeCurriculo(request.getParameter("curriculoContentType"));
 					}
@@ -221,46 +239,34 @@ public class UsuarioServlet extends HttpServlet {
 					request.setAttribute("msg", "Cep é obrigatório!");
 					request.setAttribute("user", beanCursoJsp);
 
-				} else if (id == null || id.isEmpty()) {
+				} else if (id == null || id.isEmpty() && daoUsuario.isLoginDuplicado(login)) {
+					request.setAttribute("msg", "O login já existe para outro usuário!");// "msg" é a variável jsp que está em
+																																								// <h3> no CadastroUsuario.jsp
+					request.setAttribute("user", beanCursoJsp);
 
-					if (!daoUsuario.isLoginDuplicado(login)) {
+				} else if (id == null || id.isEmpty() && daoUsuario.isSenhaDuplicada(senha)) {
+					request.setAttribute("msg", "A senha já existe para outro usuário!");
+					request.setAttribute("user", beanCursoJsp);
 
-						if (!daoUsuario.isSenhaDuplicada(senha)) {
-
-							daoUsuario.salvar(beanCursoJsp);
-							request.setAttribute("msg", "Salvo com sucesso!");
-
-						} else {
-							request.setAttribute("msg", "A senha já existe para outro usuário!");
-							request.setAttribute("user", beanCursoJsp);
-						}
-
-					} else {
-
-						request.setAttribute("msg", "O login já existe para outro usuário!");// "msg" é a variável jsp que está em
-																																									// <h3> no CadastroUsuario.jsp
-						request.setAttribute("user", beanCursoJsp);
-					}
+				} else if (id == null || id.isEmpty() && !daoUsuario.isLoginDuplicado(login) && !daoUsuario.isSenhaDuplicada(senha)) {
+					daoUsuario.salvar(beanCursoJsp);
+					request.setAttribute("msg", "Salvo com sucesso!");
 
 				} else if (id != null && !id.isEmpty()) {
-
-					if (!daoUsuario.isLoginDuplicadoAtualizar(login, id)) {
-
-						if (!daoUsuario.isSenhaDuplicadaAtualizar(senha, id)) {
-
-							daoUsuario.atualizar(beanCursoJsp);
-							request.setAttribute("msg", "Atualizado com sucesso!");
-
-						} else {
-							request.setAttribute("msg", "A senha já existe para outro usuário ao atualizar!");
-							request.setAttribute("user", beanCursoJsp);
-						}
-
-					} else {
+					
+					if (daoUsuario.isLoginDuplicadoAtualizar(login, id)) {
 						request.setAttribute("msg", "Login já existe para outro usuário ao atualizar!");
 						request.setAttribute("user", beanCursoJsp);
+						
+					} else if (daoUsuario.isSenhaDuplicadaAtualizar(senha, id)) {
+						//A senha já existe para outro usuário ao atualizar!
+						request.setAttribute("msg", "Senha inválida! Digite outra senha para atualizar.");
+						request.setAttribute("user", beanCursoJsp);
+						
+					} else {
+						daoUsuario.atualizar(beanCursoJsp);
+						request.setAttribute("msg", "Atualizado com sucesso!");
 					}
-
 				}
 
 			} catch (Exception e1) {
@@ -270,7 +276,6 @@ public class UsuarioServlet extends HttpServlet {
 			// para ficar na mesma página após cadastrar novo usuário
 			try {
 				retornarParaCadastroUsuario(request, response);
-				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -278,23 +283,27 @@ public class UsuarioServlet extends HttpServlet {
 		}
 
 	}
-	
-	private void setarCamposNoFormulario (BeanCursoJsp beanCursoJsp, HttpServletRequest request, HttpServletResponse response) throws Exception, IOException {
+
+	private void setarCamposNoFormulario(BeanCursoJsp beanCursoJsp, HttpServletRequest request,
+			HttpServletResponse response) throws Exception, IOException {
 		RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
 		// "user" é 1 usuário que está nos campos da tela.
 		request.setAttribute("user", beanCursoJsp);
 		view.forward(request, response);
 	}
-	
+
 	private void retornarParaCadastroUsuario(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-		request.setAttribute("usuario", daoUsuario.listar());// "usuario" é a tabela da página, onde serão listados os usuários que estão no BD
+		request.setAttribute("usuario", daoUsuario.listar());// "usuario" é a tabela da página, onde serão listados os
+																													// usuários que estão no BD
 		view.forward(request, response);
 	}
-	
-	private void retornarParaCadastroUsuario(String mensagem, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+	private void retornarParaCadastroUsuario(String mensagem, HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-	// "usuario" é a variável jsp do foreach no CadastroUsuario.jsp: (<c:forEach items="${usuario}" var="user">)
+		// "usuario" é a variável jsp do foreach no CadastroUsuario.jsp: (<c:forEach
+		// items="${usuario}" var="user">)
 		request.setAttribute("usuario", daoUsuario.listar());
 		request.setAttribute("msg", mensagem);
 		view.forward(request, response);
@@ -302,15 +311,15 @@ public class UsuarioServlet extends HttpServlet {
 
 	// Converte a entrada de fluxo de dados da imagem para um array de bytes
 	private static byte[] converterStreamToByte(InputStream imagem) throws IOException {
-		
+
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		int reads = imagem.read();
-		
+
 		while (reads != -1) {
 			baos.write(reads);
 			reads = imagem.read();
 		}
-		
+
 		return baos.toByteArray();
 	}
 
