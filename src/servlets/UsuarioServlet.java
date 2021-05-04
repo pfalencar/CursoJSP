@@ -155,7 +155,7 @@ public class UsuarioServlet extends HttpServlet {
 
 				// converto uma inputStream para um array de bytes e depois converter ele para
 				// base64, passar para o objeto e continuar o fluxo para salvar.
-
+				String fotoBase64 = null;
 				if (ServletFileUpload.isMultipartContent(request)) { // valida se esse é um formulário de Upload
 
 					Part imagemFoto = request.getPart("foto");
@@ -164,7 +164,7 @@ public class UsuarioServlet extends HttpServlet {
 
 						InputStream inputStreamFoto = imagemFoto.getInputStream();
 						byte[] fotoEmByte = converterStreamToByte(inputStreamFoto);
-						String fotoBase64 = new Base64().encodeBase64String(fotoEmByte);
+						fotoBase64 = new Base64().encodeBase64String(fotoEmByte);
 
 						beanCursoJsp.setFoto(fotoBase64);
 						beanCursoJsp.setContentType(imagemFoto.getContentType());
@@ -201,6 +201,40 @@ public class UsuarioServlet extends HttpServlet {
 						// e "contentTypeFotoTemp" e coloca no objeto
 						beanCursoJsp.setFoto(request.getParameter("fotoTemp"));
 						beanCursoJsp.setContentType(request.getParameter("contentTypeFotoTemp"));
+
+						/*
+						 * Faz a miniatura se a foto != null && !foto.isEmpty()
+						 */
+						if (beanCursoJsp.getFoto() != null && !beanCursoJsp.getFoto().isEmpty()) {
+							/* INÍCIO MINIATURA IMAGEM */
+
+							/* Transforma em um bufferedImage */
+							byte[] imageByteDecode = new Base64().decodeBase64(beanCursoJsp.getFoto());
+							BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageByteDecode));
+
+							/* Pega o tipo da imagem */
+							int typeImage = bufferedImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : bufferedImage.getType();
+
+							/* Cria imagem em miniatura */
+							BufferedImage resizedImage = new BufferedImage(100, 100, typeImage);
+							Graphics2D g = resizedImage.createGraphics();
+							g.drawImage(bufferedImage, 0, 0, 100, 100, null); /* Transforma a miniatura em uma imagem novamente */
+							g.dispose();
+
+							/* A imagem está em fluxo de dados, preciso escrever ela novamente: */
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							ImageIO.write(resizedImage, "png", baos);
+
+							String miniaturaBase64 = "data:image/png;base64,"
+									+ DatatypeConverter.printBase64Binary(baos.toByteArray());
+
+//						System.out.println("miniaturaBase64: " + miniaturaBase64);
+
+							beanCursoJsp.setMiniaturaFoto(miniaturaBase64);
+
+							/* FIM MINIATURA IMAGEM */
+						}
+						// else { beanCursoJsp.setMiniaturaFoto("");}
 					}
 
 					/* Processa pdf */
@@ -248,21 +282,22 @@ public class UsuarioServlet extends HttpServlet {
 					request.setAttribute("msg", "A senha já existe para outro usuário!");
 					request.setAttribute("user", beanCursoJsp);
 
-				} else if (id == null || id.isEmpty() && !daoUsuario.isLoginDuplicado(login) && !daoUsuario.isSenhaDuplicada(senha)) {
+				} else if (id == null
+						|| id.isEmpty() && !daoUsuario.isLoginDuplicado(login) && !daoUsuario.isSenhaDuplicada(senha)) {
 					daoUsuario.salvar(beanCursoJsp);
 					request.setAttribute("msg", "Salvo com sucesso!");
 
 				} else if (id != null && !id.isEmpty()) {
-					
+
 					if (daoUsuario.isLoginDuplicadoAtualizar(login, id)) {
 						request.setAttribute("msg", "Login já existe para outro usuário ao atualizar!");
 						request.setAttribute("user", beanCursoJsp);
-						
+
 					} else if (daoUsuario.isSenhaDuplicadaAtualizar(senha, id)) {
-						//A senha já existe para outro usuário ao atualizar!
+						// A senha já existe para outro usuário ao atualizar!
 						request.setAttribute("msg", "Senha inválida! Digite outra senha para atualizar.");
 						request.setAttribute("user", beanCursoJsp);
-						
+
 					} else {
 						daoUsuario.atualizar(beanCursoJsp);
 						request.setAttribute("msg", "Atualizado com sucesso!");

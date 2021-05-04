@@ -83,6 +83,14 @@
           </td>
         </tr>
         
+        <tr  class="hide" >
+          <td>Foto miniatura: </td>
+          <td>
+            <input type="file" name="miniaturaFoto"/>
+              <input type="text"  name="fotoMiniaturaTemp" readonly="readonly" value="${user.miniaturaFoto}"/> 
+          </td>
+        </tr>
+        
         <tr>
           <td></td>
           <td><input type="submit" value="Salvar"  style="width:178px;"/></td>
@@ -121,6 +129,13 @@
         <td><c:out value="${user.id}"></c:out></td>        
         <td><c:out value="${user.login}"></c:out></td>
         
+        
+        <c:if test="${user.miniaturaFoto == null}">
+          <td>
+            <img src="resources/img/user_icon_empty.png" title="Sem Imagem" width="32px" height="32px" onclick="alert('Não possui imagem!')"/>
+          </td>
+        </c:if>
+        
         <c:if test="${user.miniaturaFoto.isEmpty() == false}">
           <td>
             <a href="salvarUsuario?acao=download&tipo=imagem&user=${user.id}">
@@ -129,11 +144,6 @@
           </td>
         </c:if>
         
-        <c:if test="${user.miniaturaFoto.isEmpty() == true}">
-          <td>
-            <img src="resources/img/user_icon_empty.png" title="Sem Imagem" width="32px" height="32px" onclick="alert('Não possui imagem!')"/>
-          </td>
-        </c:if>
         
         <c:if test="${user.curriculoBase64.isEmpty() == false}">        
           <td>
