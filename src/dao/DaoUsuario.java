@@ -55,7 +55,7 @@ public class DaoUsuario {
 	public List<BeanCursoJsp> listar() throws Exception {
 		List<BeanCursoJsp> lista = new ArrayList<BeanCursoJsp>();
 
-		String sql = "SELECT * FROM usuario";
+		String sql = "SELECT * FROM usuario WHERE login <> 'admin'";
 
 		PreparedStatement statement = connection.prepareStatement(sql);
 		ResultSet resultSet = statement.executeQuery();
@@ -88,7 +88,7 @@ public class DaoUsuario {
 	public void deletar(String id) {
 		try {
 //			Long idLong = Long.parseLong(id);
-			String sql = "DELETE FROM usuario WHERE id = '" + id + "'";
+			String sql = "DELETE FROM usuario WHERE id = '" + id + "' AND login <> 'admin'";
 
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.execute();
@@ -109,7 +109,7 @@ public class DaoUsuario {
 
 	public BeanCursoJsp consultar(String id) {
 //		Long idLong = Long.parseLong(id);
-		String sql = "SELECT * FROM usuario WHERE id = '" + id + "'";
+		String sql = "SELECT * FROM usuario WHERE id = '" + id + "' AND login <> 'admin'";
 
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -200,43 +200,33 @@ public class DaoUsuario {
 		}
 	}
 
-	public void atualizar(BeanCursoJsp beanCursoJsp) {
+	public void atualizar(BeanCursoJsp usuario) {
 		try {
-			StringBuilder sqlBuilder = new StringBuilder("UPDATE usuario SET login = ?, senha = ?, nome = ?, cep = ?, rua = ?,"
-					+ " bairro = ?, cidade = ?, uf = ?, ibge = ?, fotobase64 = ?, contenttype = ?, curriculobase64 = ?, "
-					+ "contenttypecurriculo = ?");
+			String sql = "UPDATE usuario SET login = ?, senha = ?, nome = ?, cep = ?, rua = ?, bairro = ?, cidade = ?, "
+					+ " uf = ?, ibge = ?, fotobase64 =?, contenttype = ?, "
+					+ " curriculobase64 = ?, contenttypecurriculo = ?, fotominiatura = ? WHERE id = " + usuario.getId();
 			
-			boolean isMiniaturaFoto = beanCursoJsp.getMiniaturaFoto() != null && !beanCursoJsp.getMiniaturaFoto().isEmpty();			
-			if (isMiniaturaFoto) { 
-				sqlBuilder.append(", fotominiatura = ?"); 
-			}
 			
-			sqlBuilder.append("  WHERE id = ").append(beanCursoJsp.getId());
-			String sql = sqlBuilder.toString();
-
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
-			preparedStatement.setString(1, beanCursoJsp.getLogin());
-			preparedStatement.setString(2, beanCursoJsp.getSenha());
-			preparedStatement.setString(3, beanCursoJsp.getNome());
-			preparedStatement.setString(4, beanCursoJsp.getCep());
-			preparedStatement.setString(5, beanCursoJsp.getRua());
-			preparedStatement.setString(6, beanCursoJsp.getBairro());
-			preparedStatement.setString(7, beanCursoJsp.getCidade());
-			preparedStatement.setString(8, beanCursoJsp.getEstado());
-			preparedStatement.setString(9, beanCursoJsp.getIbge());
-			preparedStatement.setString(10, beanCursoJsp.getFoto());
-			preparedStatement.setString(11, beanCursoJsp.getContentType());
-			preparedStatement.setString(12, beanCursoJsp.getCurriculoBase64());
-			preparedStatement.setString(13, beanCursoJsp.getContentTypeCurriculo());
-			if (isMiniaturaFoto) { 
-				preparedStatement.setString(14, beanCursoJsp.getMiniaturaFoto());
-			}
+			preparedStatement.setString(1, usuario.getLogin());
+			preparedStatement.setString(2, usuario.getSenha());
+			preparedStatement.setString(3, usuario.getNome());
+			preparedStatement.setString(4, usuario.getCep());
+			preparedStatement.setString(5, usuario.getRua());
+			preparedStatement.setString(6, usuario.getBairro());
+			preparedStatement.setString(7, usuario.getCidade());
+			preparedStatement.setString(8, usuario.getEstado());
+			preparedStatement.setString(9, usuario.getIbge());
+			preparedStatement.setString(10, usuario.getFoto());
+			preparedStatement.setString(11, usuario.getContentType());
+			preparedStatement.setString(12, usuario.getCurriculoBase64());
+			preparedStatement.setString(13, usuario.getContentTypeCurriculo());
+			preparedStatement.setString(14, usuario.getMiniaturaFoto());
+			
 			preparedStatement.executeUpdate();
-
 			connection.commit();
-
-		} catch (Exception e) {
+			
+		} catch(Exception e) {
 			e.printStackTrace();
 			try {
 				connection.rollback();
@@ -244,7 +234,6 @@ public class DaoUsuario {
 				e1.printStackTrace();
 			}
 		}
-
 	}
 
 }
