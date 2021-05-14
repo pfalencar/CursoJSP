@@ -166,8 +166,26 @@ public class UsuarioServlet extends HttpServlet {
 						byte[] fotoEmByte = converterStreamToByte(inputStreamFoto);
 						fotoBase64 = new Base64().encodeBase64String(fotoEmByte);
 
-						beanCursoJsp.setFoto(fotoBase64);
-						beanCursoJsp.setContentType(imagemFoto.getContentType());
+						String tipoFotoPNG = "image/png";
+						String tipoFotoJPG = "image/jpeg";
+
+						String tipoExtensaoFoto = imagemFoto.getContentType();
+
+						if (tipoExtensaoFoto.equalsIgnoreCase(tipoFotoJPG) || tipoExtensaoFoto.equalsIgnoreCase(tipoFotoPNG)) {
+							beanCursoJsp.setFoto(fotoBase64);
+							beanCursoJsp.setContentType(imagemFoto.getContentType());
+
+						} else {
+							mensagem = "Aceita somente foto em JPG ou PNG!";
+							String fotoTemp = request.getParameter("fotoTemp");
+							if (fotoTemp != null) {
+								// se não tiver nada no campo de foto, pega o que tem nos parâmetros "fotoTemp"
+								// e "contentTypeFotoTemp" e coloca no objeto
+								beanCursoJsp.setFoto(fotoTemp);
+								beanCursoJsp.setContentType(request.getParameter("contentTypeFotoTemp"));
+							}
+							retornarParaCadastroUsuario(mensagem, request, response);
+						}
 
 						/* INÍCIO MINIATURA IMAGEM */
 
@@ -175,27 +193,38 @@ public class UsuarioServlet extends HttpServlet {
 						byte[] imageByteDecode = new Base64().decodeBase64(fotoBase64);
 						BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(imageByteDecode));
 
-						/* Pega o tipo da imagem */
-						int typeImage = bufferedImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : bufferedImage.getType();
+						if (bufferedImage != null) {
+							/* Pega o tipo da imagem */
+							int typeImage = bufferedImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : bufferedImage.getType();
 
-						/* Cria imagem em miniatura */
-						BufferedImage resizedImage = new BufferedImage(100, 100, typeImage);
-						Graphics2D g = resizedImage.createGraphics();
-						g.drawImage(bufferedImage, 0, 0, 100, 100, null); /* Transforma a miniatura em uma imagem novamente */
-						g.dispose();
+							/* Cria imagem em miniatura */
+							BufferedImage resizedImage = new BufferedImage(100, 100, typeImage);
+							Graphics2D g = resizedImage.createGraphics();
+							g.drawImage(bufferedImage, 0, 0, 100, 100, null); /* Transforma a miniatura em uma imagem novamente */
+							g.dispose();
 
-						/* A imagem está em fluxo de dados, preciso escrever ela novamente: */
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						ImageIO.write(resizedImage, "png", baos);
+							/* A imagem está em fluxo de dados, preciso escrever ela novamente: */
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							ImageIO.write(resizedImage, "png", baos);
 
-						String miniaturaBase64 = "data:image/png;base64," + DatatypeConverter.printBase64Binary(baos.toByteArray());
+							String miniaturaBase64 = "data:image/png;base64,"
+									+ DatatypeConverter.printBase64Binary(baos.toByteArray());
 
 //						System.out.println("miniaturaBase64: " + miniaturaBase64);
 
-						beanCursoJsp.setMiniaturaFoto(miniaturaBase64);
+							beanCursoJsp.setMiniaturaFoto(miniaturaBase64);
 
-						/* FIM MINIATURA IMAGEM */
-
+							/* FIM MINIATURA IMAGEM */
+						} else {
+							mensagem = "Insira uma foto no campo de foto.";
+							String fotoMiniaturaTemp = request.getParameter("fotoMiniaturaTemp");
+							if (fotoMiniaturaTemp != null) {
+								// se não tiver nada no campo de miniaturaFoto, pega o que tem nos parâmetros
+								// "fotoMiniaturaTemp" e coloco no objeto
+								beanCursoJsp.setMiniaturaFoto(fotoMiniaturaTemp);
+							}
+							retornarParaCadastroUsuario(mensagem, request, response);
+						}
 					} else {
 						// se não tiver nada no campo de foto, pega o que tem nos parâmetros "fotoTemp"
 						// e "contentTypeFotoTemp" e coloca no objeto
@@ -244,9 +273,26 @@ public class UsuarioServlet extends HttpServlet {
 						String curriculoBase64 = new Base64()
 								.encodeBase64String(converterStreamToByte(arquivoCurriculo.getInputStream()));
 
-						beanCursoJsp.setCurriculoBase64(curriculoBase64);
-						beanCursoJsp.setContentTypeCurriculo(arquivoCurriculo.getContentType());
+						String tipoCurriculoWord = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+						String tipoCurriculoPDF = "application/pdf";
 
+						String tipoDoCurriculo = arquivoCurriculo.getContentType();
+
+						if (tipoDoCurriculo.equalsIgnoreCase(tipoCurriculoWord)
+								|| tipoDoCurriculo.equalsIgnoreCase(tipoCurriculoPDF)) {
+							beanCursoJsp.setCurriculoBase64(curriculoBase64);
+							beanCursoJsp.setContentTypeCurriculo(arquivoCurriculo.getContentType());
+						} else {
+							mensagem = "Aceita currículos somente em Word ou PDF!";
+							String curriculoTemporario = request.getParameter("curriculoTemp");
+							if (curriculoTemporario != null || (curriculoTemporario != null && !curriculoTemporario.isBlank())) {
+								// se não tiver nada no campo de curriculo, pega o que tem no parâmetro
+								// "curriculoTemp" e coloco no objeto
+								beanCursoJsp.setCurriculoBase64(curriculoTemporario);
+								beanCursoJsp.setContentTypeCurriculo(request.getParameter("curriculoContentType"));
+							}
+							retornarParaCadastroUsuario(mensagem, request, response);
+						}
 					} else {
 						// se não tiver nada no campo de curriculo, pega o que tem nos parâmetros
 						// "curriculoTemp" e "curriculoContentType" e coloca no objeto
@@ -285,7 +331,8 @@ public class UsuarioServlet extends HttpServlet {
 				} else if (id == null
 						|| id.isEmpty() && !daoUsuario.isLoginDuplicado(login) && !daoUsuario.isSenhaDuplicada(senha)) {
 					daoUsuario.salvar(beanCursoJsp);
-					request.setAttribute("msg", "Salvo com sucesso!");
+					mensagem = "Salvo com sucesso!";
+					retornarParaCadastroUsuario(mensagem, request, response);
 
 				} else if (id != null && !id.isEmpty()) {
 
@@ -300,7 +347,8 @@ public class UsuarioServlet extends HttpServlet {
 
 					} else {
 						daoUsuario.atualizar(beanCursoJsp);
-						request.setAttribute("msg", "Atualizado com sucesso!");
+						mensagem = "Atualizado com sucesso!";
+						retornarParaCadastroUsuario(mensagem, request, response);
 					}
 				}
 
@@ -308,9 +356,9 @@ public class UsuarioServlet extends HttpServlet {
 				e1.printStackTrace();
 			}
 
-			// para ficar na mesma página após cadastrar novo usuário
+			// para ficar na mesma página após cadastrar novo usuário ou atualizar
 			try {
-				retornarParaCadastroUsuario(request, response);
+				//retornarParaCadastroUsuario(request, response);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -336,12 +384,13 @@ public class UsuarioServlet extends HttpServlet {
 
 	private void retornarParaCadastroUsuario(String mensagem, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
-		// "usuario" é a variável jsp do foreach no CadastroUsuario.jsp: (<c:forEach
-		// items="${usuario}" var="user">)
-		request.setAttribute("usuario", daoUsuario.listar());
-		request.setAttribute("msg", mensagem);
-		view.forward(request, response);
+			RequestDispatcher view = request.getRequestDispatcher("CadastroUsuario.jsp");
+			// "usuario" é a variável jsp do foreach no CadastroUsuario.jsp: (<c:forEach
+			// items="${usuario}" var="user">)
+			request.setAttribute("usuario", daoUsuario.listar());
+			request.setAttribute("msg", mensagem);
+			view.forward(request, response);
+			mensagem = "";
 	}
 
 	// Converte a entrada de fluxo de dados da imagem para um array de bytes
